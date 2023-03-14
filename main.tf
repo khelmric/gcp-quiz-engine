@@ -14,14 +14,13 @@ resource "google_project_service" "quiz_project_services" {
     "cloudresourcemanager.googleapis.com",
     "serviceusage.googleapis.com",
     "firestore.googleapis.com",
-    "firebase.googleapis.com",
-    "firebasestorage.googleapis.com",
-    "identitytoolkit.googleapis.com",
     "compute.googleapis.com",
     "containerregistry.googleapis.com",
     "run.googleapis.com",
     "cloudbuild.googleapis.com",
-    "artifactregistry.googleapis.com"
+    "artifactregistry.googleapis.com",
+    "appengine.googleapis.com",
+    "orgpolicy.googleapis.com"
   ])
   service = each.key
 
@@ -31,55 +30,15 @@ resource "google_project_service" "quiz_project_services" {
   }
 }
 
-# Create Terraform service account
-#resource "google_service_account" "quiz_tf_sa" {
-#  project         = var.project_id
-#  account_id      = "sa-tf-quiz-engine"
-#  display_name    = "Quiz Engine Terraform Service Account"
-#}
+resource "google_project_organization_policy" "org_policy_resource_location" {
+  project   = var.project_id
+  constraint = "gcp.resourceLocations"
 
-# Grant roles to Terraform service account
-#resource "google_project_iam_member" "quiz_tf_sa_roles" {
-#  for_each = toset([
-##    "roles/firebase.admin",
-#    "roles/serviceusage.serviceUsageAdmin",
-#    "roles/appengine.appAdmin",
-#    "roles/appengine.appCreator",
-#    "roles/editor",
-#    "roles/storage.admin"
-#  ])
-#  role = each.key
-#  member = "serviceAccount:${google_service_account.quiz_tf_sa.email}"
-#  project = var.project_id
-#}
+  list_policy {
+    allow {
+      all = true
+    }
+  }
 
-# Allow my-user to create a access token
-#resource "google_service_account_iam_member" "grant-token-iam" {
-#  service_account_id = google_service_account.quiz_tf_sa.id
-#  role               = "roles/iam.serviceAccountTokenCreator"
-#  member             = "user:${data.google_client_openid_userinfo.my-user.email}"
-#}
-
-# Create access token
-#data "google_service_account_access_token" "default" {
-#  target_service_account = google_service_account.quiz_tf_sa.email
-#  scopes                 = ["userinfo-email", "cloud-platform"]
-#  lifetime               = "300s"
-#  depends_on = [
-#    google_project_iam_member.quiz_tf_sa_roles
-#  ]
-#}
-
-
-# Create sa-key with service account
-#resource "google_service_account_key" "mykey" {
-#  provider           = google-beta.gcloud-user
-#  service_account_id = google_service_account.service_account.id
-#  # Wait for the account being added to roles
-#  depends_on = [
-#    google_project_iam_member.firebase-admin-iam,
-#    google_project_iam_member.service-usage-admin-iam,
-#  ]
-#}
-
+}
 

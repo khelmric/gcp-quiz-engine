@@ -1,31 +1,20 @@
-#resource "google_app_engine_application" "quiz-app" {
-#  provider                    = google-beta
-#  project                     = var.project_id
-#  location_id                 = "${var.location}"
-#  database_type               = "CLOUD_FIRESTORE"
-#
-#  depends_on = [
-#    google_project_service.quiz_project_services,
-#    google_project_iam_member.quiz_tf_sa_roles
-#  ]
-#}
-
-
 resource "google_service_account" "quiz-app-sa" {
   project                     = var.project_id
   account_id   = "quiz-app-account"
   display_name = "Quiz App Service Account"
 }
 
-resource "google_project_iam_member" "gae_api" {
-  project = google_service_account.quiz-app-sa.project
-  role    = "roles/compute.networkUser"
-  member  = "serviceAccount:${google_service_account.quiz-app-sa.email}"
-}
 
-resource "google_project_iam_member" "storage_viewer" {
+resource "google_project_iam_member" "quiz_app_sa_roles" {
+  for_each = toset([
+    "roles/storage.objectViewer",
+    "roles/compute.networkUser",
+    "roles/appengine.appAdmin",
+    "roles/appengine.appCreator",
+    "roles/datastore.owner"
+  ])
+  role = each.key
   project = google_service_account.quiz-app-sa.project
-  role    = "roles/storage.objectViewer"
   member  = "serviceAccount:${google_service_account.quiz-app-sa.email}"
 }
 
@@ -52,9 +41,10 @@ resource "google_storage_bucket_object" "upload-app" {
 resource "google_app_engine_application" "quiz_app" {
   project  = var.project_id
   location_id = var.location
+  database_type = "CLOUD_FIRESTORE"
 }
 
-# Create a PHP App Engine service
+# Create a Python App Engine service
 resource "google_app_engine_standard_app_version" "quiz_app_v1" {
   project         = var.project_id
   version_id      = "v1"
@@ -67,22 +57,13 @@ resource "google_app_engine_standard_app_version" "quiz_app_v1" {
   deployment {
     zip {
       source_url = "https://storage.googleapis.com/${google_storage_bucket.quiz_storage_app.name}/app.zip"
-#      source_url = "https://storage.googleapis.com/quiz-engine-storage-app-0004/app.zip"
     }
   }
   env_variables = {
     GOOGLE_CLOUD_PROJECT = "${var.project_id}"
   }
   automatic_scaling {
-#    max_concurrent_requests = 10
-#    min_idle_instances = 1
-#    max_idle_instances = 2
-#    min_pending_latency = "1s"
-#    max_pending_latency = "5s"
     standard_scheduler_settings {
-#      target_cpu_utilization = 0.5
-#      target_throughput_utilization = 0.75
-#      min_instances = 1
       max_instances = 2
     }
   }

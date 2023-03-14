@@ -28,8 +28,8 @@ variable "location" {
   default     = "EU"
 }
 
-variable "bucket_suffix" {
-  description = "Custom suffix for the storage bucket."
+variable "suffix" {
+  description = "Custom suffix for unique IDs."
   type        = string
   default     = null
 }
