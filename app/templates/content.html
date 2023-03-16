@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="row">
+    <div class="col-80">
+        <table>
+            <tbody>
+                {% for main_category in main_categories %}
+                <tr>
+                    <td>{{ main_category.category_name }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+{% endblock %}
+

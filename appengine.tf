@@ -50,7 +50,7 @@ resource "google_app_engine_standard_app_version" "quiz_app_v1" {
   version_id      = "v1"
   service         = "default"
   runtime         = "python39"
-  instance_class      = "F4_1G"
+  instance_class      = "F1"
   entrypoint {
     shell = "python3 ./main.py"
   }
@@ -67,9 +67,18 @@ resource "google_app_engine_standard_app_version" "quiz_app_v1" {
       max_instances = 2
     }
   }
+  handlers {
+    url_regex                   = ".*"
+    redirect_http_response_code = "REDIRECT_HTTP_RESPONSE_CODE_301"
+    security_level              = "SECURE_ALWAYS"
+    script {
+      script_path = "auto"
+    }
+  }
 
   delete_service_on_destroy = true
-  service_account = google_service_account.quiz-app-sa.email
+#  service_account = google_service_account.quiz-app-sa.email
+  service_account = "${var.project_id}@appspot.gserviceaccount.com"
 
   depends_on = [
     google_storage_bucket_object.upload-app
