@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="row">
+    <h3>Select Category</h3>
+</div>
+<div class="row">
+    <div class="col-80">
+        {% for main_category in main_categories %}
+            <form action="/main_category" method="POST">
+                <input hidden type="text" value="{{ main_category.id }}" name="selected_main_category_id">
+                <input hidden type="text" value="{{ main_category.name }}" name="selected_main_category_name">
+                <input class="buttonlist" type="submit" value="{{ main_category.name }}">
+            </form>
+        {% endfor %}
+    </div> 
+
+</div>
+
+{% endblock %}
+

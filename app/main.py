@@ -24,6 +24,7 @@ def index():
     # clear variables
     main_categories.clear()
     sub_categories.clear()
+    groups.clear()
     header_path=""
     # query main categories
     firestore_main_categories = db_ref.where('type', '==', 'main-category')
@@ -32,39 +33,20 @@ def index():
     # get cookies
     cookies = request.cookies
     # get cookies for the main category
-    if cookies.get("selected_main_category_id") == None:
-        selected_main_category_id = ""
-        selected_main_category_name = ""
-        main_category_visibility = "show_main_categories"
-        selected_sub_category_id = ""
-        selected_sub_category_name = ""
-        sub_category_visibility = "hide_sub_categories"
-    else:  
-        selected_main_category_id = cookies.get("selected_main_category_id")
-        selected_main_category_name = cookies.get("selected_main_category_name")
-        main_category_visibility = "hide_main_categories"
-        header_path=selected_main_category_name
-        # query sub categories
-        firestore_sub_categories = db_ref.where('type', '==', 'sub-category')
-        firestore_sub_categories = firestore_sub_categories.where('main_category_id', '==', selected_main_category_id)
-        for sub_category in firestore_sub_categories.stream():
-            sub_categories.append((sub_category.to_dict()))
-        if cookies.get("selected_sub_category_id") == None:
-            selected_sub_category_id = ""
-            selected_sub_category_name = ""
-            sub_category_visibility = "show_sub_categories"
-        else:  
-            selected_sub_category_id = cookies.get("selected_sub_category_id")
-            selected_sub_category_name = cookies.get("selected_sub_category_name")
-            sub_category_visibility = "hide_sub_categories"    
-            header_path=header_path + "  ►  " + selected_sub_category_name
+    selected_main_category_id = ""
+    selected_main_category_name = ""
+    main_category_visibility = "show_main_categories"
+    selected_sub_category_id = ""
+    selected_sub_category_name = ""
+    sub_category_visibility = "hide_sub_categories"
+    selected_group_id = ""
+    selected_group_name = ""
+    group_visibility = "hide_groups"    
+
     return render_template('index.html', 
         main_categories=main_categories,
         main_category_visibility=main_category_visibility,
         selected_main_category_id=selected_main_category_id,
-        sub_categories=sub_categories,
-        sub_category_visibility=sub_category_visibility,
-        selected_sub_category_id=selected_sub_category_id,
         header_path=header_path
         )
 
@@ -73,6 +55,7 @@ def home():
     # clear variables
     main_categories.clear()
     sub_categories.clear()
+    groups.clear()
     # redirect to index  
     res = make_response(redirect('/'))
     # delete all cookies
@@ -80,14 +63,35 @@ def home():
     res.set_cookie('selected_main_category_name', '', expires=0)
     res.set_cookie('selected_sub_category_id', '', expires=0)
     res.set_cookie('selected_sub_category_name', '', expires=0)
+    res.set_cookie('selected_group_id', '', expires=0)
+    res.set_cookie('selected_group_name', '', expires=0)
     return res
 
 @app.route('/main_category', methods = ['POST'])
 def main_category():
+    # get cookies
+    cookies = request.cookies
+    # get form output    
     selected_main_category_id = request.form['selected_main_category_id']
     selected_main_category_name = request.form['selected_main_category_name']
-    # redirect to index   
-    res = make_response(redirect('/'))
+    header_path=selected_main_category_name
+    # query sub categories
+    firestore_sub_categories = db_ref.where('type', '==', 'sub-category')
+    firestore_sub_categories = firestore_sub_categories.where('main_category_id', '==', selected_main_category_id)
+    for sub_category in firestore_sub_categories.stream():
+        sub_categories.append((sub_category.to_dict()))    
+    # render main_category    
+    res = make_response(render_template('main_category.html', 
+        main_categories=main_categories,
+        selected_main_category_id=selected_main_category_id,
+        sub_categories=sub_categories,
+        header_path=header_path
+        ))
+    # delete cookies
+    res.set_cookie('selected_sub_category_id', '', expires=0)
+    res.set_cookie('selected_sub_category_name', '', expires=0)
+    res.set_cookie('selected_group_id', '', expires=0)
+    res.set_cookie('selected_group_name', '', expires=0)    
     # set main category cookies
     res.set_cookie(
        'selected_main_category_id',
@@ -98,15 +102,33 @@ def main_category():
        'selected_main_category_name',
        value = selected_main_category_name,
        #secure = True
-       )   
+       )      
     return res
 
 @app.route('/sub_category', methods = ['POST'])
 def sub_category():
+    # get cookies
+    cookies = request.cookies
+    selected_main_category_name = cookies.get("selected_main_category_name")
+    # get form output    
     selected_sub_category_id = request.form['selected_sub_category_id']
     selected_sub_category_name = request.form['selected_sub_category_name']
-    # redirect to index   
-    res = make_response(redirect('/'))
+    header_path=selected_main_category_name + "  ►  " + selected_sub_category_name
+    # query groups
+    firestore_groups = db_ref.where('type', '==', 'group')
+    firestore_groups = firestore_groups.where('sub_category_id', '==', selected_sub_category_id)
+    for group in firestore_groups.stream():
+        groups.append((group.to_dict()))    
+    # render sub_category    
+    res = make_response(render_template('sub_category.html', 
+        sub_categories=sub_categories,
+        selected_sub_category_id=selected_sub_category_id,
+        groups=groups,
+        header_path=header_path
+        ))
+    # delete cookies
+    res.set_cookie('selected_group_id', '', expires=0)
+    res.set_cookie('selected_group_name', '', expires=0)    
     # set sub category cookies
     res.set_cookie(
        'selected_sub_category_id',
@@ -117,7 +139,7 @@ def sub_category():
        'selected_sub_category_name',
        value = selected_sub_category_name,
        #secure = True
-       )   
+       )      
     return res
 
 if __name__ == '__main__':

@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="row">
+    <h3>Select Question Group</h3>
+</div>
+<div class="row">
+    <div class="col-80">
+        {% for group in groups %}
+            <form action="/group" method="POST">
+                <input hidden type="text" value="{{ group.id }}" name="selected_group_id">
+                <input hidden type="text" value="{{ group.name }}" name="selected_group_name">
+                <input class="buttonlist" type="submit" value="{{ group.name }}">
+            </form>
+        {% endfor %}
+    </div> 
+
+</div>
+
+{% endblock %}
+

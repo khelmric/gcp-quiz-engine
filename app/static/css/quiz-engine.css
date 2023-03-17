@@ -83,3 +83,7 @@ body {
 .hide_sub_categories {
   display: none;
 }
+
+.hide_groups {
+  display: none;
+}
