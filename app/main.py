@@ -9,6 +9,7 @@ app = Flask(__name__)
 main_categories = []
 sub_categories = []
 groups = []
+questions = []
 
 # Use the application default credentials.
 cred = credentials.ApplicationDefault()
@@ -25,6 +26,7 @@ def index():
     main_categories.clear()
     sub_categories.clear()
     groups.clear()
+    questions.clear()
     header_path=""
     # query main categories
     firestore_main_categories = db_ref.where('type', '==', 'main-category')
@@ -45,8 +47,6 @@ def index():
 
     return render_template('index.html', 
         main_categories=main_categories,
-        main_category_visibility=main_category_visibility,
-        selected_main_category_id=selected_main_category_id,
         header_path=header_path
         )
 
@@ -67,7 +67,7 @@ def home():
     res.set_cookie('selected_group_name', '', expires=0)
     return res
 
-@app.route('/main_category', methods = ['POST'])
+@app.route('/main_category', methods = ['GET', 'POST'])
 def main_category():
     # get cookies
     cookies = request.cookies
@@ -105,7 +105,7 @@ def main_category():
        )      
     return res
 
-@app.route('/sub_category', methods = ['POST'])
+@app.route('/sub_category', methods = ['GET', 'POST'])
 def sub_category():
     # get cookies
     cookies = request.cookies
@@ -121,7 +121,6 @@ def sub_category():
         groups.append((group.to_dict()))    
     # render sub_category    
     res = make_response(render_template('sub_category.html', 
-        sub_categories=sub_categories,
         selected_sub_category_id=selected_sub_category_id,
         groups=groups,
         header_path=header_path
@@ -138,6 +137,46 @@ def sub_category():
     res.set_cookie(
        'selected_sub_category_name',
        value = selected_sub_category_name,
+       #secure = True
+       )      
+    return res
+
+@app.route('/group', methods = ['GET', 'POST'])
+def group():
+    # get cookies
+    cookies = request.cookies
+    selected_main_category_name = cookies.get("selected_main_category_name")
+    selected_sub_category_name = cookies.get("selected_sub_category_name")
+    # get form output    
+    selected_group_id = request.form['selected_group_id']
+    selected_group_name = request.form['selected_group_name']
+    header_path=selected_main_category_name + "  ►  " + selected_sub_category_name + "  ►  " + selected_group_name
+    # query questions
+    firestore_questions = db_ref.where('type', '==', 'question')
+    firestore_questions = firestore_questions.where('group_id', '==', selected_group_id)
+    question_count = 0
+    for question in firestore_questions.stream():
+        questions.append((question.to_dict()))
+        question_count = question_count + 1
+        print(question_count)
+    # render group    
+    res = make_response(render_template('group.html', 
+        questions=questions,
+        selected_main_category_name=selected_main_category_name,
+        selected_sub_category_name=selected_sub_category_name,
+        selected_group_name=selected_group_name,
+        question_count=question_count,
+        header_path=header_path
+        )) 
+    # set sub category cookies
+    res.set_cookie(
+       'selected_group_id',
+       value = selected_group_id,
+       #secure = True
+       )
+    res.set_cookie(
+       'selected_group_name',
+       value = selected_group_name,
        #secure = True
        )      
     return res

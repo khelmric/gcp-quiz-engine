@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="row">
+    <div class="col-80">
+        <table>
+        <tr><td><b>Category:</b></td><td>{{ selected_main_category_name }}</td></tr>
+        <tr><td><b>Subcategory:</b></td><td>{{ selected_sub_category_name }}</td></tr>
+        <tr><td><b>Question group:</b></td><td>{{ selected_group_name }}</td></tr>
+        <tr><td><b>Questions:</b></td><td>{{ question_count }}</td></tr>
+        </table>
+        <form action="/question" method="POST">
+            <input hidden type="text" value="true" name="start_quiz">
+            <input class="actionbutton" type="submit" value=" ► ">
+        </form>
+        <p></p>
+    </div> 
+
+</div>
+
+{% endblock %}
+
