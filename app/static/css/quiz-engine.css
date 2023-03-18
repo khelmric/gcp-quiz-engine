@@ -58,6 +58,16 @@ body {
   font-size: 12px;
 }
 
+.question_counter{
+  font-size: 12px;
+  text-align: right;
+}
+
+.footer{
+  font-size: 12px;
+  text-align: right;
+}
+
 .actionbutton {
   display: inline-block;
   padding: 15px 25px;
@@ -77,4 +87,14 @@ body {
 .actionbutton:active {
   background-color: #000067;
   transform: translateY(4px);
+}
+
+.answer_col_char {
+  padding-left: 40px;
+  padding-right: 10px;
+}
+
+.answer_col_input {
+  padding-left: 10px;
+  padding-right: 10px;
 }
