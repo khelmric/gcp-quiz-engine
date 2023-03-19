@@ -56,6 +56,8 @@ def index():
     res.set_cookie('selected_sub_category_name', '', expires=0)
     res.set_cookie('selected_group_id', '', expires=0)
     res.set_cookie('selected_group_name', '', expires=0)
+    res.set_cookie('question_counter', '', expires=0)  
+    res.set_cookie('action', '', expires=0)
 
     return res
 
@@ -92,7 +94,9 @@ def main_category():
         res.set_cookie('selected_sub_category_id', '', expires=0)
         res.set_cookie('selected_sub_category_name', '', expires=0)
         res.set_cookie('selected_group_id', '', expires=0)
-        res.set_cookie('selected_group_name', '', expires=0)    
+        res.set_cookie('selected_group_name', '', expires=0)
+        res.set_cookie('question_counter', '', expires=0)
+        res.set_cookie('action', '', expires=0)     
         # set main category cookies
         res.set_cookie(
         'selected_main_category_id',
@@ -138,7 +142,9 @@ def sub_category():
             ))
         # delete cookies
         res.set_cookie('selected_group_id', '', expires=0)
-        res.set_cookie('selected_group_name', '', expires=0)    
+        res.set_cookie('selected_group_name', '', expires=0)
+        res.set_cookie('question_counter', '', expires=0)
+        res.set_cookie('action', '', expires=0) 
         # set sub category cookies
         res.set_cookie(
         'selected_sub_category_id',
@@ -193,6 +199,9 @@ def group():
             question_count=question_count,
             header_path=header_path
             )) 
+        # delete cookies
+        res.set_cookie('question_counter', '', expires=0)
+        res.set_cookie('action', '', expires=0)    
         # set group category cookies
         res.set_cookie(
             'selected_group_id',
@@ -206,30 +215,74 @@ def group():
         )
         res.set_cookie(
             'question_counter',
-            value = "-1",
+            value = "0",
             #secure = True
         )
     return res
 
 @app.route('/question', methods = ['GET', 'POST'])
 def question():
+    # vars
+    global answers_order
+    global selected_answer
+    global result
+    global question_count
+    global submit_button_text
+    global quiz_status_bar
     # get cookies
     cookies = request.cookies
-    question_counter = cookies.get("question_counter")
-    if request.method == 'GET':
-        question_counter = int(cookies.get("question_counter"))
-    if request.method == 'POST':  
-        # increase question counter by 1 
-        question_counter = int(question_counter)+1
+    question_counter = int(cookies.get("question_counter"))
+    action = cookies.get("action")
+    #answers_order = cookies.get("answers_order")
+#    if request.method == 'GET':
+#        question_counter = int(cookies.get("question_counter"))
+    if request.method == 'POST':
+        # next question or show results
+        if action == 'next':
+            action = 'result'
+            # increase question counter by 1 
+            question_counter = int(question_counter)+1
+            # create list for answer indexes
+            if question_counter < int(question_count):
+                answers_order = list(range(0, len(questions[question_counter].get('answers'))))
+                # shuffle question list
+                random.shuffle(answers_order)
+            # reset values
+            selected_answer = -1
+            result = 'None'
+            submit_button_text = 'Submit'
+        elif action == 'result':
+            action = 'next'
+            # question counter will not be incresed
+            question_counter = int(question_counter)
+            # get selected answer
+            selected_answer = request.form["selected_answer"]
+            print(selected_answer)
+            print(answers_order)
+            result = questions[question_counter].get('answers')[int(selected_answer)]['correct']
+            if result == True:
+                quiz_status_bar = quiz_status_bar + '&#9989;'
+            else:
+                quiz_status_bar = quiz_status_bar + '&#10060;'    
+            # Submit button text to Next
+            submit_button_text = 'Next'
+        else:
+            action = 'result'
+            # question counter will not be incresed (first run, action = None)
+            question_counter = int(question_counter)
+            # create list for answer indexes
+            answers_order = list(range(0, len(questions[question_counter].get('answers'))))
+            # shuffle question list
+            random.shuffle(answers_order)
+            # reset values
+            selected_answer = -1
+            result = 'None'
+            submit_button_text = 'Submit'
+            quiz_status_bar = ''
     # check if there are questions left
-    print(str(question_counter) + "/" + str(question_count))
     if question_counter < int(question_count):
-        # create temp list for answer indexes
-        answers_order = list(range(0, len(questions[question_counter].get('answers'))))
         # create temp list for answer character ids
         answers_char = [chr(value) for value in range(64, len(questions[question_counter].get('answers'))+65)]
-        # shuffle question list
-        random.shuffle(answers_order)
         # render question  
         res = make_response(render_template('question.html', 
             question_text = questions[question_counter].get('question'),
@@ -237,17 +290,32 @@ def question():
             question_count = question_count,
             answers_char = answers_char,
             answers_order = answers_order,
+            selected_answer = int(selected_answer),
             answers = questions[question_counter].get('answers'),
+            action = action,
+            result = result,
+            submit_button_text = submit_button_text,
+            quiz_status_bar = quiz_status_bar,
             header_path = header_path
             )) 
-        # set question category cookies    
+        # set cookies    
         res.set_cookie(
                 'question_counter',
                 value = str(question_counter),
                 #secure = True
-            )    
+            )
+        res.set_cookie(
+                'action',
+                value = action,
+                #secure = True
+            )        
+        #res.set_cookie(
+        #        'answers_order',
+        #        value = answers_order,
+        #        #secure = True
+        #    )  
     else:
-        res = make_response(redirect('/'))        
+        res = make_response(redirect('/sub_category'))        
     return res
     
 

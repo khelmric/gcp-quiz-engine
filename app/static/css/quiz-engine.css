@@ -4,7 +4,11 @@ body {
 
 .col-10{flex:0 0 auto;width:10%}
 .col-20{flex:0 0 auto;width:20%}
+.col-30{flex:0 0 auto;width:20%}
+.col-40{flex:0 0 auto;width:20%}
 .col-50{flex:0 0 auto;width:50%}
+.col-60{flex:0 0 auto;width:20%}
+.col-70{flex:0 0 auto;width:20%}
 .col-80{flex:0 0 auto;width:80%}
 .col-90{flex:0 0 auto;width:90%}
 .col-100{flex:0 0 auto;width:100%}
@@ -68,6 +72,11 @@ body {
   text-align: right;
 }
 
+.quiz_status{
+  font-size: 8px;
+  text-align: left;
+}
+
 .actionbutton {
   display: inline-block;
   padding: 15px 25px;
@@ -92,9 +101,36 @@ body {
 .answer_col_char {
   padding-left: 40px;
   padding-right: 10px;
+  width: 5%;
 }
 
 .answer_col_input {
   padding-left: 10px;
   padding-right: 10px;
+  width: 5%;
+}
+
+.answer_col_answer {
+  padding-left: 10px;
+  padding-right: 10px;
+  width: 15%;
+}
+
+.answer_col_correct {
+  padding-left: 10px;
+  padding-right: 10px;
+}
+
+.correct_answer {
+  text-align: center;
+  color: #2b2;
+  font-weight: bold;
+  font-size: 18px;
+}
+
+.wrong_answer {
+  text-align: center;
+  color: #b22;
+  font-weight: bold;
+  font-size: 18px;
 }

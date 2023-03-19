@@ -2,30 +2,58 @@
 
 {% block content %}
 
-<div class="row">
-    <div class="col-80">
-        <table>
-        <tr><td></td><td>{{ question_text|safe }}</td></tr>
-        </table>
-        <hr>
-        <form action="/question" method="POST">
+<form action="/question" method="POST">
+    <div class="row">
+        <div class="col-100">
             <table>
-                {% for answer_id in answers_order %}
-                    <tr><td class="answer_col_char"><b>{{ answers_char[loop.index] }}</b></td>
-                        <td class="answer_col_input"><input  type="radio" value="{{ answer_id }}" name="selected_answer"></td>
-                        <td>{{ answers[answer_id].answer|safe }}</td></tr>
-                    <tr><td></td><td></td><td><hr></td></tr>
-                {% endfor %}    
-                <tr><td></td><td></td><td>
-                    <input class="actionbutton" type="submit" value="Submit">
-                </td></tr>
+            <tr><td></td><td>{{ question_text|safe }}</td></tr>
             </table>
-            <input hidden type="text" value="{{ question_counter }}" name="question_counter">
-        </form>
-        <p></p>
-    </div> 
-
-</div>
+            <hr>
+                <table>
+                    {% for answer_id in answers_order %}
+                        <tr><td class="answer_col_char"><b>{{ answers_char[loop.index] }}</b></td>
+                            {% if answer_id == selected_answer %}
+                                <td class="answer_col_input"><input type="radio" value="{{ answer_id }}" name="selected_answer" checked required></td>
+                            {% else %} 
+                                <td class="answer_col_input"><input type="radio" value="{{ answer_id }}" name="selected_answer" required></td>
+                            {% endif %}
+                            <td class="answer_col_answer">{{ answers[answer_id].answer|safe }}</td>
+                            <td class="answer_col_correct">
+                                {% if action == 'next' %}
+                                    {% if answers[answer_id].correct == True %}
+                                        &#9989;
+                                    {% else %}   
+                                        &#10060;
+                                    {% endif %} 
+                                {% endif %}     
+                            </td>
+                            <td><i>
+                                {% if action == 'next' %}
+                                    {{ answers[answer_id].comment|safe }}
+                                {% endif %}
+                                </i></td></tr>
+                        <tr><td></td><td></td><td><hr></td><td></td><td></td></tr>
+                    {% endfor %}    
+                </table>
+                <input hidden type="text" value="{{ question_counter }}" name="question_counter">
+            <p></p>
+        </div> 
+    </div>
+    <div class="row">
+        <div class="col-30">
+            {% if result != 'None' %}
+                {% if result == True %}
+                    <div class="correct_answer">Correct!</div>
+                {% else %} 
+                    <div class="wrong_answer">Wrong!</div>
+                {% endif %}
+            {% endif %}
+        </div>
+        <div class="col-70">
+            <input class="actionbutton" type="submit" value="{{ submit_button_text }}">
+        </div>
+    </div>
+</form>
 
 {% endblock %}
 
