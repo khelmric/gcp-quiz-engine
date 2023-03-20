@@ -12,10 +12,18 @@
                 <table>
                     {% for answer_id in answers_order %}
                         <tr><td class="answer_col_char"><b>{{ answers_char[loop.index] }}</b></td>
-                            {% if answer_id == selected_answer %}
-                                <td class="answer_col_input"><input type="radio" value="{{ answer_id }}" name="selected_answer" checked required></td>
+                            {% if answer_id in selected_answers %}
+                                {% if answer_type == 'radio' %}
+                                    <td class="answer_col_input"><input type="{{ answer_type }}" value="{{ answer_id }}" name="selected_answer" checked required></td>
+                                {% else %}
+                                    <td class="answer_col_input"><input type="{{ answer_type }}" value="{{ answer_id }}" name="selected_answer" checked></td>
+                                {% endif %}    
                             {% else %} 
-                                <td class="answer_col_input"><input type="radio" value="{{ answer_id }}" name="selected_answer" required></td>
+                                {% if answer_type == 'radio' %}
+                                    <td class="answer_col_input"><input type="{{ answer_type }}" value="{{ answer_id }}" name="selected_answer" required></td>
+                                {% else %}
+                                    <td class="answer_col_input"><input type="{{ answer_type }}" value="{{ answer_id }}" name="selected_answer"></td>
+                                {% endif %}  
                             {% endif %}
                             <td class="answer_col_answer">{{ answers[answer_id].answer|safe }}</td>
                             <td class="answer_col_correct">

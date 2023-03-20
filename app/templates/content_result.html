@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="row">
+    <h3>Result</h3>
+</div>
+<div class="row">
+    <div class="col-30"></div>
+    <div class="col-50">
+        <h3>Your result is {{ correct_answers_percentage }}</h3>
+            <form action="/result" method="POST">
+                <input class="actionbutton" type="submit" value="Close">
+            </form>
+    </div> 
+
+</div>
+
+{% endblock %}
+

@@ -1,4 +1,5 @@
 import random
+import json
 import firebase_admin
 from firebase_admin import credentials
 from firebase_admin import firestore
@@ -186,7 +187,9 @@ def group():
         question_count = 0
         questions.clear()
         for question in firestore_questions.stream():
-            questions.append((question.to_dict()))
+            questions.append(question.to_dict())
+            #print(json.dumps(question.to_dict(), indent = 4))
+            #print(question.to_dict())
             question_count = question_count + 1
         # shuffle question list
         random.shuffle(questions)    
@@ -224,18 +227,20 @@ def group():
 def question():
     # vars
     global answers_order
-    global selected_answer
+    global selected_answers
     global result
+    global results
     global question_count
     global submit_button_text
     global quiz_status_bar
+    global result_correct_answers_percentage
+    global question_correct_answers
+    global answer_type
     # get cookies
     cookies = request.cookies
     question_counter = int(cookies.get("question_counter"))
     action = cookies.get("action")
-    #answers_order = cookies.get("answers_order")
-#    if request.method == 'GET':
-#        question_counter = int(cookies.get("question_counter"))
+    # get form inputs
     if request.method == 'POST':
         # next question or show results
         if action == 'next':
@@ -248,7 +253,7 @@ def question():
                 # shuffle question list
                 random.shuffle(answers_order)
             # reset values
-            selected_answer = -1
+            selected_answers = []
             result = 'None'
             submit_button_text = 'Submit'
         elif action == 'result':
@@ -256,14 +261,19 @@ def question():
             # question counter will not be incresed
             question_counter = int(question_counter)
             # get selected answer
-            selected_answer = request.form["selected_answer"]
-            print(selected_answer)
-            print(answers_order)
-            result = questions[question_counter].get('answers')[int(selected_answer)]['correct']
-            if result == True:
+            selected_answers = []
+            for answ in request.form.getlist("selected_answer"):
+                selected_answers.append(int(answ))
+            #result = questions[question_counter].get('answers')[int(selected_answer)]['correct']
+            if sorted(selected_answers) == sorted(question_correct_answers):
+                result = True
                 quiz_status_bar = quiz_status_bar + '&#9989;'
             else:
-                quiz_status_bar = quiz_status_bar + '&#10060;'    
+                result = False
+                quiz_status_bar = quiz_status_bar + '&#10060;'
+            results.append(result)
+            result_correct_answers = len([item for item in results if item == True])
+            result_correct_answers_percentage = str(int(round(result_correct_answers / question_count * 100, 0))) + "%"
             # Submit button text to Next
             submit_button_text = 'Next'
         else:
@@ -274,11 +284,22 @@ def question():
             answers_order = list(range(0, len(questions[question_counter].get('answers'))))
             # shuffle question list
             random.shuffle(answers_order)
-            # reset values
-            selected_answer = -1
+            # reset values for the initial run
+            selected_answers = [ -1 ]
             result = 'None'
             submit_button_text = 'Submit'
             quiz_status_bar = ''
+            results = []
+        if action == 'result' and question_counter < int(question_count):
+            # get current questions correct answers
+            question_correct_answers = []
+            for index, question_correct_answer in enumerate(questions[question_counter].get('answers')):
+                if question_correct_answer['correct'] == True:
+                    question_correct_answers.append(index)
+            if len(question_correct_answers) > 1:
+                answer_type = "checkbox"
+            else:
+                answer_type = "radio"    
     # check if there are questions left
     if question_counter < int(question_count):
         # create temp list for answer character ids
@@ -290,8 +311,9 @@ def question():
             question_count = question_count,
             answers_char = answers_char,
             answers_order = answers_order,
-            selected_answer = int(selected_answer),
+            selected_answers = selected_answers,
             answers = questions[question_counter].get('answers'),
+            answer_type = answer_type,
             action = action,
             result = result,
             submit_button_text = submit_button_text,
@@ -309,16 +331,19 @@ def question():
                 value = action,
                 #secure = True
             )        
-        #res.set_cookie(
-        #        'answers_order',
-        #        value = answers_order,
-        #        #secure = True
-        #    )  
     else:
-        res = make_response(redirect('/sub_category'))        
+        res = make_response(redirect('/result'))      
     return res
     
-
+@app.route('/result', methods = ['GET', 'POST'])
+def result():
+    if request.method == 'POST':
+        res = make_response(redirect('/sub_category'))
+    else:    
+        res = make_response(render_template('result.html',
+                correct_answers_percentage = result_correct_answers_percentage
+            ))
+    return res
 
 
 if __name__ == '__main__':

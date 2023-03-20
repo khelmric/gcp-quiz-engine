@@ -14,8 +14,10 @@ body {
 .col-100{flex:0 0 auto;width:100%}
 
 .buttonlist{
-    color:#fff;
-    background-color:#9999aa;
+    /*color:#fff;
+    background-color:#9999aa;*/
+    color:#222;
+    background-color:#fff;
     border:#0f71ff;
     margin: 4px 2px;
     cursor: pointer;
@@ -31,6 +33,7 @@ body {
 }
 
 .buttonlist:hover{
+    color:#fff;
     background-color:#000067;
     border:#0048ba;
 }
