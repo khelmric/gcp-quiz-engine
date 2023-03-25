@@ -3,7 +3,15 @@
 {% block content %}
 
 <div class="row">
-    <div class="col-80">
+    <div class="col-30">
+        <form action="/sub_category" method="GET">
+            <input class="actionbutton" type="submit" value="&#9665; Back">
+        </form>
+    </div>
+</div>
+<div class="row">
+    <div class="col-30"></div>
+    <div class="col-50">
         <form action="/question" method="POST">
         <table>
         <tr><td><b>Category:</b></td><td>{{ selected_main_category_name }}</td></tr>
@@ -12,7 +20,7 @@
         <tr><td><b>Questions:</b></td><td>{{ question_count }}</td></tr>
         <tr><td></td><td>
             <input hidden type="text" value="-1" name="question_counter">
-            <input class="actionbutton" type="submit" value=" ► ">
+            <input class="actionbutton" type="submit" value=" Start ► ">
         </td></tr>
         </table>
         </form>

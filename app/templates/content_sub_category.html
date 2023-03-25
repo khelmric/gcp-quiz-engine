@@ -3,20 +3,65 @@
 {% block content %}
 
 <div class="row">
-    <h3>Select Question Group</h3>
+    <div class="col-30">
+        <form action="/main_category" method="GET">
+            <input class="actionbutton" type="submit" value="&#9665; Back">
+        </form>
+    </div>
 </div>
-<div class="row">
-    <div class="col-80">
+<div class="row">   
         {% for group in groups %}
+        <div class="col-10"></div>
+        <div class="col-80">
             <form action="/group" method="POST">
                 <input hidden type="text" value="{{ group.id }}" name="selected_group_id">
                 <input hidden type="text" value="{{ group.name }}" name="selected_group_name">
                 <input class="buttonlist" type="submit" value="{{ group.name }}">
             </form>
+        </div> 
+        <div class="col-10">   
+            {% if edit_mode == True %}
+                <table><tr><td class="editbuttons_cell">    
+                <form action="/data_maintenance" method="POST">
+                    <input hidden type="text" value="{{ group.id }}" name="selected_id">
+                    <input hidden type="text" value="{{ group.name }}" name="selected_name">
+                    <input hidden type="text" value="{{ selected_sub_category_id }}" name="selected_parent_id">
+                    <input hidden type="text" value="group" name="selected_type">
+                    <input hidden type="text" value="edit" name="action">
+                    <input class="editbutton" type="submit" value="&#9998;">
+                </form>
+                </td><td>
+                <form action="/data_maintenance" method="POST">
+                    <input hidden type="text" value="{{ group.id }}" name="selected_id">
+                    <input hidden type="text" value="{{ group.name }}" name="selected_name">
+                    <input hidden type="text" value="{{ selected_sub_category_id }}" name="selected_parent_id">
+                    <input hidden type="text" value="group" name="selected_type">
+                    <input hidden type="text" value="delete" name="action">
+                    <input class="editbutton" type="submit" value="&#10006;">
+                </form>
+                </td></tr></table>
+            {% endif %}    
+        </div>     
+        
         {% endfor %}
-    </div> 
-
+        {% if edit_mode == True %}
+            <div class="col-90"></div>
+            <div class="col-10">
+                <form action="/data_maintenance" method="POST">
+                    <input hidden type="text" value="" name="selected_id">
+                    <input hidden type="text" value="" name="selected_name">
+                    <input hidden type="text" value="{{ selected_sub_category_id }}" name="selected_parent_id">
+                    <input hidden type="text" value="group" name="selected_type">
+                    <input hidden type="text" value="add" name="action">
+                    <input class="editbutton" type="submit" value="&#10010; Add new">
+                </form>
+            </div>
+        {% endif %} 
+    
 </div>
 
+
 {% endblock %}
+
+
 

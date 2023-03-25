@@ -1,5 +1,6 @@
 import random
 import json
+import time
 import firebase_admin
 from firebase_admin import credentials
 from firebase_admin import firestore
@@ -12,6 +13,7 @@ sub_categories = []
 groups = []
 questions = []
 header_path = ""
+edit_mode = False
 
 # use the application default credentials to access Cloud Firestore
 cred = credentials.ApplicationDefault()
@@ -25,12 +27,15 @@ db_ref = db.collection(u'quiz-db')
 
 @app.route('/index', methods = ['GET', 'POST'])
 def index():
+    # get global vars
+    global edit_mode
     # clear variables
     main_categories.clear()
     sub_categories.clear()
     groups.clear()
     questions.clear()
     header_path=""
+
     # query main categories
     firestore_main_categories = db_ref.where('type', '==', 'main-category')
     for main_category in firestore_main_categories.stream():
@@ -48,7 +53,8 @@ def index():
     # render index  
     res = make_response(render_template('index.html', 
         main_categories=main_categories,
-        header_path=header_path
+        header_path=header_path,
+        edit_mode=edit_mode
         ))
     # delete all cookies
     res.set_cookie('selected_main_category_id', '', expires=0)
@@ -62,8 +68,25 @@ def index():
 
     return res
 
+@app.route('/editmode', methods = ['GET', 'POST'])
+def editmode():
+    global edit_mode
+    if edit_mode == True:
+        edit_mode = False
+    else:
+        edit_mode = True
+    res = make_response(redirect('/'))  
+    #res = make_response(render_template('index.html', 
+    #    main_categories=main_categories,
+    #    header_path=header_path,
+    #    edit_mode=edit_mode
+    #    ))     
+    return res
+
 @app.route('/main_category', methods = ['GET', 'POST'])
 def main_category():
+    # get global vars
+    global edit_mode
     # get cookies
     cookies = request.cookies
     if request.method == 'GET':
@@ -89,7 +112,8 @@ def main_category():
             main_categories=main_categories,
             selected_main_category_id=selected_main_category_id,
             sub_categories=sub_categories,
-            header_path=header_path
+            header_path=header_path,
+            edit_mode=edit_mode
             ))
         # delete cookies
         res.set_cookie('selected_sub_category_id', '', expires=0)
@@ -113,6 +137,8 @@ def main_category():
 
 @app.route('/sub_category', methods = ['GET', 'POST'])
 def sub_category():
+    # get global vars
+    global edit_mode
     # get cookies
     cookies = request.cookies
     selected_main_category_name = cookies.get("selected_main_category_name")
@@ -139,7 +165,8 @@ def sub_category():
         res = make_response(render_template('sub_category.html', 
             selected_sub_category_id=selected_sub_category_id,
             groups=groups,
-            header_path=header_path
+            header_path=header_path,
+            edit_mode=edit_mode
             ))
         # delete cookies
         res.set_cookie('selected_group_id', '', expires=0)
@@ -161,6 +188,8 @@ def sub_category():
 
 @app.route('/group', methods = ['GET', 'POST'])
 def group():
+    # get global vars
+    global edit_mode
     # get cookies
     cookies = request.cookies
     selected_main_category_name = cookies.get("selected_main_category_name")
@@ -200,7 +229,8 @@ def group():
             selected_sub_category_name=selected_sub_category_name,
             selected_group_name=selected_group_name,
             question_count=question_count,
-            header_path=header_path
+            header_path=header_path,
+            edit_mode=edit_mode
             )) 
         # delete cookies
         res.set_cookie('question_counter', '', expires=0)
@@ -225,7 +255,8 @@ def group():
 
 @app.route('/question', methods = ['GET', 'POST'])
 def question():
-    # vars
+    # get global vars
+    global edit_mode
     global answers_order
     global selected_answers
     global result
@@ -318,7 +349,8 @@ def question():
             result = result,
             submit_button_text = submit_button_text,
             quiz_status_bar = quiz_status_bar,
-            header_path = header_path
+            header_path = header_path,
+            edit_mode=edit_mode
             )) 
         # set cookies    
         res.set_cookie(
@@ -337,14 +369,121 @@ def question():
     
 @app.route('/result', methods = ['GET', 'POST'])
 def result():
+    # get global vars
+    global edit_mode
     if request.method == 'POST':
         res = make_response(redirect('/sub_category'))
     else:    
         res = make_response(render_template('result.html',
-                correct_answers_percentage = result_correct_answers_percentage
+                correct_answers_percentage = result_correct_answers_percentage,
+                edit_mode=edit_mode
             ))
     return res
 
+@app.route('/data_maintenance', methods = ['GET', 'POST'])
+def data_maintenance():
+    # get global vars
+    global edit_mode
+    global action
+    global prev_action
+    global selected_type
+    global selected_id
+    global selected_name
+    global selected_parent_id
+    # get form output    
+    if request.method == 'POST':
+        selected_type = request.form['selected_type']
+        selected_id = request.form['selected_id']
+        selected_name = request.form['selected_name']
+        try:
+            selected_parent_id = request.form['selected_parent_id']
+        except:
+            selected_parent_id = ""    
+        try:
+            prev_action = request.form['prev_action']
+        except:
+            prev_action = ""       
+        action = request.form['action']
+    # check if variables exist, handle exceptions
+    try: action
+    except NameError: action = None
+    try: prev_action
+    except NameError: prev_action = None
+    try: selected_id
+    except NameError: selected_id = None
+    try: selected_type
+    except NameError: selected_type = None
+    try: selected_name
+    except NameError: selected_name = None
+    try: selected_parent_id
+    except NameError: selected_parent_id = None
+    print(prev_action)
+    # check if required vars are there, otherwise back to previous page 
+    if action == None:
+        res = make_response(redirect('/index'))
+    elif action == 'edit':
+        res = make_response(render_template('data_maintenance.html',
+                selected_type = selected_type,
+                selected_id = selected_id,
+                selected_name = selected_name,
+                selected_parent_id = selected_parent_id,
+                prev_action = action,
+                button_text = 'Update',
+                edit_mode=edit_mode))
+    elif action == 'add':
+        ts_id = 'm' + str(time.time())
+        res = make_response(render_template('data_maintenance.html',
+                selected_type = selected_type,
+                selected_id = ts_id,
+                selected_name = selected_name,
+                selected_parent_id = selected_parent_id,
+                prev_action = action,
+                button_text = 'Add',
+                edit_mode=edit_mode))                
+    elif action == 'delete':
+        firestore_documents = db_ref.where('type', '==', selected_type).where('id', '==', selected_id)
+        for selected_document in firestore_documents.stream():
+            doc_ref = db_ref.document(selected_document.id)
+            doc_ref.delete()
+    elif action == 'apply':
+        if prev_action == 'edit':
+            firestore_documents = db_ref.where('type', '==', selected_type).where('id', '==', selected_id)
+            for selected_document in firestore_documents.stream():
+                doc_ref = db_ref.document(selected_document.id)
+                doc_ref.update({u'name': selected_name})
+        elif prev_action == 'add':
+            if selected_type == 'main-category':
+                data = {
+                        u'id': selected_id,
+                        u'name': selected_name,
+                        u'type': selected_type    
+                }
+            if selected_type == 'sub-category':
+                data = {
+                        u'id': selected_id,
+                        u'main_category_id': selected_parent_id,
+                        u'name': selected_name,
+                        u'type': selected_type    
+                }
+            if selected_type == 'group':
+                data = {
+                        u'id': selected_id,
+                        u'sub_category_id': selected_parent_id,
+                        u'name': selected_name,
+                        u'type': selected_type    
+                }
+            print(data)    
+            db_ref.add(data)
+    if action != 'edit' and action != 'add':
+        if selected_type == 'main-category':
+            res = make_response(redirect('/index'))
+        elif selected_type == 'sub-category':
+            res = make_response(redirect('/main_category'))
+        elif selected_type == 'group':
+            res = make_response(redirect('/sub_category'))  
+        elif selected_type == 'question':
+            res = make_response(redirect('/group'))           
+    return res
 
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0', port=8080)

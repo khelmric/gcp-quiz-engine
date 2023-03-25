@@ -3,20 +3,56 @@
 {% block content %}
 
 <div class="row">
-    <h3>Select Category</h3>
+    <div class="col-30"></div>
 </div>
-<div class="row">
-    <div class="col-80">
+<div class="row">   
         {% for main_category in main_categories %}
+        <div class="col-10"></div>
+        <div class="col-80">
             <form action="/main_category" method="POST">
                 <input hidden type="text" value="{{ main_category.id }}" name="selected_main_category_id">
                 <input hidden type="text" value="{{ main_category.name }}" name="selected_main_category_name">
                 <input class="buttonlist" type="submit" value="{{ main_category.name }}">
             </form>
+        </div> 
+        <div class="col-10">   
+            {% if edit_mode == True %}
+                <table><tr><td class="editbuttons_cell">    
+                <form action="/data_maintenance" method="POST">
+                    <input hidden type="text" value="{{ main_category.id }}" name="selected_id">
+                    <input hidden type="text" value="{{ main_category.name }}" name="selected_name">
+                    <input hidden type="text" value="main-category" name="selected_type">
+                    <input hidden type="text" value="edit" name="action">
+                    <input class="editbutton" type="submit" value="&#9998;">
+                </form>
+                </td><td>
+                <form action="/data_maintenance" method="POST">
+                    <input hidden type="text" value="{{ main_category.id }}" name="selected_id">
+                    <input hidden type="text" value="{{ main_category.name }}" name="selected_name">
+                    <input hidden type="text" value="main-category" name="selected_type">
+                    <input hidden type="text" value="delete" name="action">
+                    <input class="editbutton" type="submit" value="&#10006;">
+                </form>
+                </td></tr></table>
+            {% endif %}    
+        </div>     
+        
         {% endfor %}
-    </div> 
-
+        {% if edit_mode == True %}
+            <div class="col-90"></div>
+            <div class="col-10">
+                <form action="/data_maintenance" method="POST">
+                    <input hidden type="text" value="" name="selected_id">
+                    <input hidden type="text" value="" name="selected_name">
+                    <input hidden type="text" value="main-category" name="selected_type">
+                    <input hidden type="text" value="add" name="action">
+                    <input class="editbutton" type="submit" value="&#10010; Add new">
+                </form>
+            </div>
+        {% endif %} 
+    
 </div>
+
 
 {% endblock %}
 

@@ -4,11 +4,11 @@ body {
 
 .col-10{flex:0 0 auto;width:10%}
 .col-20{flex:0 0 auto;width:20%}
-.col-30{flex:0 0 auto;width:20%}
-.col-40{flex:0 0 auto;width:20%}
+.col-30{flex:0 0 auto;width:30%}
+.col-40{flex:0 0 auto;width:40%}
 .col-50{flex:0 0 auto;width:50%}
-.col-60{flex:0 0 auto;width:20%}
-.col-70{flex:0 0 auto;width:20%}
+.col-60{flex:0 0 auto;width:60%}
+.col-70{flex:0 0 auto;width:70%}
 .col-80{flex:0 0 auto;width:80%}
 .col-90{flex:0 0 auto;width:90%}
 .col-100{flex:0 0 auto;width:100%}
@@ -23,7 +23,7 @@ body {
     cursor: pointer;
     text-decoration: none;
     padding: 10px 20px;
-    width: 70%;
+    width: 60%;
     text-align: center;
     font-size: 16px;
     display: inline-block;
@@ -36,6 +36,10 @@ body {
     color:#fff;
     background-color:#000067;
     border:#0048ba;
+}
+
+.edit_mode_active {
+  background-color:#db0000;
 }
 
 .navbar {
@@ -82,7 +86,7 @@ body {
 
 .actionbutton {
   display: inline-block;
-  padding: 15px 25px;
+  padding: 5px 25px;
   font-size: 18px;
   cursor: pointer;
   text-align: center;
@@ -136,4 +140,40 @@ body {
   color: #b22;
   font-weight: bold;
   font-size: 18px;
+}
+
+.editbutton {
+  display: inline-block;
+  padding: 4px 10px;
+  font-size: 18px;
+  cursor: pointer;
+  text-align: center;
+  text-decoration: none;
+  outline: none;
+  color: #db0000;
+  background-color: #fff;
+  border: none;
+  border-radius: 15px;
+}
+
+.editbutton:hover {
+  background-color: #db0000;
+  color: #fff;
+}
+
+.editbutton:active {
+  background-color: #db0000;
+  transform: translateY(4px);
+}
+
+.big_input {
+  font-size: 16px;
+  width: 60%;
+}
+
+.big_label {
+  font-size: 16px;
+  font-weight: bold;
+  width: 10%;
+  display: inline-block;
 }

@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="row">
+    <div class="col-30"></div>
+</div>
+    <form action="/data_maintenance" method="POST">
+        <div class="row">   
+            <div class="col-10"></div>
+            <div class="col-80">
+                <label class="big_label" for="selected_name">Name:</label>
+                <input class="big_input" type="text" value="{{ selected_name }}" name="selected_name" required>
+            </div>
+        </div>
+        <div class="row">    
+            <div class="col-10"></div>
+            <div class="col-80">
+                <label class="big_label" for="selected_id">ID:</label>
+                <input class="big_input" type="text" value="{{ selected_id }}" name="selected_id" readonly>
+            </div>
+        </div>
+        <div class="row">    
+            <div class="col-10"></div>
+            <div class="col-80">
+                <label class="big_label" for="selected_parent_id">Parent ID:</label>
+                <input class="big_input" type="text" value="{{ selected_parent_id }}" name="selected_parent_id" readonly>
+            </div>
+        </div>
+        <div class="row">    
+            <div class="col-10"></div>
+            <div class="col-80">
+                <label class="big_label" for="selected_type">Type:</label> 
+                <input class="big_input" type="text" value="{{ selected_type }}" name="selected_type" readonly>
+            </div>
+        </div>
+        <div class="row">     
+            <div class="col-10"></div>
+            <div class="col-80">
+                <input class="editbutton" type="submit" value={{ button_text }}>
+            </div> 
+            <div class="col-10">    
+        </div>
+        <input hidden type="text" value="{{ prev_action }}" name="prev_action"> 
+        <input hidden type="text" value="apply" name="action"> 
+    </form>
+
+    
+</div>
+
+
+{% endblock %}
