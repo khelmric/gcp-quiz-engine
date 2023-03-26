@@ -1,9 +1,9 @@
 <div class="navbar">
     <a href="/">Home</a>
     {% if edit_mode == True %}
-        <a class="edit_mode_active" href="/editmode">Edit mode <input type="checkbox" checked disabled></a>
+        <a class="edit_mode_active" href="/editmode">Edit mode <input type="checkbox" checked readonly></a>
     {% else %} 
-        <a href="/editmode">Edit mode <input type="checkbox" disabled></a>
+        <a href="/editmode">Edit mode <input type="checkbox" readonly></a>
     {% endif %}   
 </div>
 <div class="row">

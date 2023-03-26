@@ -149,10 +149,10 @@ body {
   cursor: pointer;
   text-align: center;
   text-decoration: none;
-  outline: none;
   color: #db0000;
   background-color: #fff;
-  border: none;
+  outline: none;
+  border: 2px solid #db0000;
   border-radius: 15px;
 }
 
@@ -171,9 +171,18 @@ body {
   width: 60%;
 }
 
+.big_input_readonly {
+  font-size: 16px;
+  width: 60%;
+  background-color: #ddd;
+  color: #555;
+}
+
 .big_label {
   font-size: 16px;
   font-weight: bold;
   width: 10%;
   display: inline-block;
+  vertical-align: top;
 }
+

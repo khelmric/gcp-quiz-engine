@@ -3,48 +3,141 @@
 {% block content %}
 
 <div class="row">
-    <div class="col-30"></div>
+    <div class="col-30">
+        <form action="/group" method="GET">
+            <input class="actionbutton" type="submit" value="&#9665; Back">
+        </form>
+    </div>
 </div>
     <form action="/data_maintenance" method="POST">
-        <div class="row">   
-            <div class="col-10"></div>
-            <div class="col-80">
-                <label class="big_label" for="selected_name">Name:</label>
-                <input class="big_input" type="text" value="{{ selected_name }}" name="selected_name" required>
+        {% if selected_type == 'main-category' or selected_type == 'sub-category' or selected_type == 'group' %}
+            <div class="row">   
+                <div class="col-10"></div>
+                <div class="col-80">
+                    <label class="big_label" for="selected_name">Name:</label>
+                    <input class="big_input" type="text" value="{{ selected_name }}" name="selected_name" required>
+                </div>
             </div>
-        </div>
-        <div class="row">    
-            <div class="col-10"></div>
-            <div class="col-80">
-                <label class="big_label" for="selected_id">ID:</label>
-                <input class="big_input" type="text" value="{{ selected_id }}" name="selected_id" readonly>
+            <div class="row">    
+                <div class="col-10"></div>
+                <div class="col-80">
+                    <label class="big_label" for="selected_id">ID:</label>
+                    <input class="big_input_readonly" type="text" value="{{ selected_id }}" name="selected_id" readonly>
+                </div>
             </div>
-        </div>
-        <div class="row">    
-            <div class="col-10"></div>
-            <div class="col-80">
-                <label class="big_label" for="selected_parent_id">Parent ID:</label>
-                <input class="big_input" type="text" value="{{ selected_parent_id }}" name="selected_parent_id" readonly>
+            <div class="row">    
+                <div class="col-10"></div>
+                <div class="col-80">
+                    <label class="big_label" for="selected_parent_id">Parent ID:</label>
+                    <input class="big_input_readonly" type="text" value="{{ selected_parent_id }}" name="selected_parent_id" readonly>
+                </div>
             </div>
-        </div>
-        <div class="row">    
-            <div class="col-10"></div>
-            <div class="col-80">
-                <label class="big_label" for="selected_type">Type:</label> 
-                <input class="big_input" type="text" value="{{ selected_type }}" name="selected_type" readonly>
+            <div class="row">    
+                <div class="col-10"></div>
+                <div class="col-80">
+                    <label class="big_label" for="selected_type">Type:</label> 
+                    <input class="big_input_readonly" type="text" value="{{ selected_type }}" name="selected_type" readonly>
+                </div>
             </div>
-        </div>
+        {% else %} 
+            <div class="row">
+                <h3>Question</h3>
+            </div>
+            <div class="row">   
+                <div class="col-10"></div>
+                <div class="col-80">
+                    <label class="big_label" for="selected_question">Question:</label>
+                    <textarea class="big_input" rows="13" cols="230" name="selected_question" required>{{ selected_question }}</textarea>
+                </div>
+            </div>
+            <div class="row">    
+                <div class="col-10"></div>
+                <div class="col-80">
+                    <label class="big_label" for="selected_id">ID:</label>
+                    <input class="big_input_readonly" type="text" value="{{ selected_id }}" name="selected_id" readonly>
+                </div>
+            </div>
+            <div class="row">    
+                <div class="col-10"></div>
+                <div class="col-80">
+                    <label class="big_label" for="selected_parent_id">Parent ID:</label>
+                    <input class="big_input_readonly" type="text" value="{{ selected_parent_id }}" name="selected_parent_id" readonly>
+                </div>
+            </div>
+            <div class="row">    
+                <div class="col-10"></div>
+                <div class="col-80">
+                    <label class="big_label" for="selected_type">Type:</label> 
+                    <input class="big_input_readonly" type="text" value="{{ selected_type }}" name="selected_type" readonly>
+                </div>
+            </div>
+            <div class="row">   
+                <div class="col-10"></div>
+                <div class="col-80">
+                    <label class="big_label" for="selected_documentation">Document:</label>
+                    <input class="big_input" type="text" value="{{ selected_documentation }}" name="selected_documentation">
+                </div>
+            </div>
+            <div class="row">   
+                <div class="col-10"></div>
+                <div class="col-80">
+                    <label class="big_label" for="selected_solution_comment">Solution comment:</label>
+                    <textarea class="big_input" rows="10" cols="230" name="selected_solution_comment">{{ selected_solution_comment }}</textarea>
+                </div>
+            </div>
+
+            {% for idx in range(0,8) %}
+                <div class="row">
+                    <h3>Answer #{{ idx+1 }}</h3>
+                </div>
+                <div class="row">    
+                    <div class="col-10"></div>
+                    <div class="col-80">
+                        <label class="big_label" for="selected_answer_answer">Answer:</label>
+                        <textarea class="big_input" rows="5" cols="230" name="selected_answer_answer">{% if selected_answers is defined %}{% if selected_answers[idx] is defined %}{% if selected_answers[idx].answer is defined %}{{ selected_answers[idx].answer }}{% endif %}{% endif %}{% endif %}</textarea>
+                    </div>
+                </div>
+                <div class="row">   
+                    <div class="col-10"></div>
+                    <div class="col-80">
+                        <label class="big_label" for="selected_answer_comment">Comment:</label>
+                        <textarea class="big_input" rows="5" cols="230" name="selected_answer_comment">{% if selected_answers is defined %}{% if selected_answers[idx] is defined %}{% if selected_answers[idx].comment is defined %}{{ selected_answers[idx].comment }}{% endif %}{% endif %}{% endif %}</textarea>
+                    </div>
+                </div>
+                <div class="row">   
+                    <div class="col-10"></div>
+                    <div class="col-80">
+                        <label class="big_label" for="checkbox_answer_correct{{ idx }}">Correct:</label>
+                        {% if selected_answers is defined %}
+                            {% if selected_answers[idx] is defined %}
+                                {% if selected_answers[idx].correct is defined %}
+                                    {% if selected_answers[idx].correct == True %}
+                                        <input class="big_input" type="checkbox" checked name="selected_answer_correct{{ idx }}">
+                                    {% else %}
+                                        <input class="big_input" type="checkbox" name="selected_answer_correct{{ idx }}">
+                                    {% endif %}
+                                {% else %}   
+                                    <input class="big_input" type="checkbox" name="selected_answer_correct{{ idx }}">
+                                {% endif %}
+                            {% else %}   
+                                <input class="big_input" type="checkbox" name="selected_answer_correct{{ idx }}">  
+                            {% endif %}
+                        {% else %}   
+                            <input class="big_input" type="checkbox" name="selected_answer_correct{{ idx }}">
+                        {% endif %}   
+                    </div>
+                </div>
+            {% endfor %}
+
+        {% endif %} 
         <div class="row">     
             <div class="col-10"></div>
-            <div class="col-80">
-                <input class="editbutton" type="submit" value={{ button_text }}>
-            </div> 
-            <div class="col-10">    
+            <div class="col-80"></div> 
+            <div class="col-10"><input class="editbutton" type="submit" value={{ button_text }}></div>  
         </div>
         <input hidden type="text" value="{{ prev_action }}" name="prev_action"> 
         <input hidden type="text" value="apply" name="action"> 
     </form>
-
     
 </div>
 

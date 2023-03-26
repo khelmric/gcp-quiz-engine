@@ -25,9 +25,53 @@
         </table>
         </form>
         <p></p>
-    </div> 
-
+    </div>
 </div>
+{% if edit_mode == True %}
+    <div class="row">   
+        {% for question in questions %}
+        <div class="col-10"></div>
+        <div class="col-80">
+            <form action="/question" method="POST">
+                <input type="text" value="{{ question.id }}" name="selected_question_id" readonly>
+                <input type="text" style="width:80%;" value="{{ question.question }}" name="selected_question_text" readonly>
+            </form>
+        </div> 
+        <div class="col-10">   
+                <table><tr><td class="editbuttons_cell">    
+                <form action="/data_maintenance" method="POST">
+                    <input hidden type="text" value="{{ question.id }}" name="selected_id">
+                    <input hidden type="text" value="{{ question.question }}" name="selected_question">
+                    <input hidden type="text" value="{{ selected_group_id }}" name="selected_parent_id">
+                    <input hidden type="text" value="question" name="selected_type">
+                    <input hidden type="text" value="edit" name="action">
+                    <input class="editbutton" type="submit" value="&#9998;">
+                </form>
+                </td><td>
+                <form action="/data_maintenance" method="POST">
+                    <input hidden type="text" value="{{ question.id }}" name="selected_id">
+                    <input hidden type="text" value="{{ question.question }}" name="selected_question">
+                    <input hidden type="text" value="{{ selected_group_id }}" name="selected_parent_id">
+                    <input hidden type="text" value="question" name="selected_type">
+                    <input hidden type="text" value="delete" name="action">
+                    <input class="editbutton" type="submit" value="&#10006;">
+                </form>
+                </td></tr></table>  
+        </div>     
+        {% endfor %}
+            <div class="col-90"></div>
+            <div class="col-10">
+                <form action="/data_maintenance" method="POST">
+                    <input hidden type="text" value="" name="selected_id">
+                    <input hidden type="text" value="" name="selected_question">
+                    <input hidden type="text" value="{{ selected_group_id }}" name="selected_parent_id">
+                    <input hidden type="text" value="question" name="selected_type">
+                    <input hidden type="text" value="add" name="action">
+                    <input class="editbutton" type="submit" value="&#10010; Add new">
+                </form>
+            </div>
+    </div>
+{% endif %} 
 
 {% endblock %}
 

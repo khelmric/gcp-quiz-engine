@@ -228,6 +228,7 @@ def group():
             selected_main_category_name=selected_main_category_name,
             selected_sub_category_name=selected_sub_category_name,
             selected_group_name=selected_group_name,
+            selected_group_id=selected_group_id,
             question_count=question_count,
             header_path=header_path,
             edit_mode=edit_mode
@@ -382,19 +383,21 @@ def result():
 
 @app.route('/data_maintenance', methods = ['GET', 'POST'])
 def data_maintenance():
-    # get global vars
-    global edit_mode
-    global action
-    global prev_action
-    global selected_type
-    global selected_id
-    global selected_name
-    global selected_parent_id
-    # get form output    
+    # global vars
+    global selected_answers
+    # set lists
+    selected_answers_answer = []
+    selected_answers_comment = []
+    selected_answers_correct = []
+    # get form data
     if request.method == 'POST':
         selected_type = request.form['selected_type']
         selected_id = request.form['selected_id']
-        selected_name = request.form['selected_name']
+        action = request.form['action']
+        try:
+            selected_name = request.form['selected_name']
+        except:
+            selected_name = ""    
         try:
             selected_parent_id = request.form['selected_parent_id']
         except:
@@ -402,8 +405,48 @@ def data_maintenance():
         try:
             prev_action = request.form['prev_action']
         except:
-            prev_action = ""       
-        action = request.form['action']
+            prev_action = ""
+        try:
+            selected_question = request.form['selected_question']
+        except:
+            selected_question = ""
+        try:
+            selected_documentation = request.form['selected_documentation']
+        except:
+            selected_documentation = ""
+        try:
+            selected_solution_comment = request.form['selected_solution_comment']
+        except:
+            selected_solution_comment = ""        
+        # get answers
+        try:
+            for answ in request.form.getlist("selected_answer_answer"):
+                selected_answers_answer.append(answ)
+        except:
+            selected_answers_answer = []
+        try:    
+            for answ in request.form.getlist("selected_answer_comment"):
+                selected_answers_comment.append(answ)
+        except:
+            selected_answers_comment = []
+        selected_answers_checkboxes = [ "selected_answer_correct0", "selected_answer_correct1", "selected_answer_correct2", "selected_answer_correct3", "selected_answer_correct4", "selected_answer_correct5", "selected_answer_correct6", "selected_answer_correct7"]
+        for checkbox_name in selected_answers_checkboxes:
+            try:
+                answ = request.form.get(checkbox_name)
+                if answ == 'on':
+                    selected_answers_correct.append(True)
+                else:
+                    selected_answers_correct.append(False)
+            except:
+                selected_answers_correct.append(False)
+        if selected_answers_answer:   
+            selected_answers.clear()
+        #print(len(selected_answers_answer))
+        #print(len(selected_answers_comment))
+        #print(len(selected_answers_correct))
+        for idx, ans in enumerate(selected_answers_answer):
+            selected_answers.append({ 'comment': selected_answers_comment[idx], 'answer': ans, 'correct': selected_answers_correct[idx] })    
+        #    selected_answers = []
     # check if variables exist, handle exceptions
     try: action
     except NameError: action = None
@@ -417,16 +460,34 @@ def data_maintenance():
     except NameError: selected_name = None
     try: selected_parent_id
     except NameError: selected_parent_id = None
-    print(prev_action)
+    try: selected_question
+    except NameError: selected_question = None
+    try: selected_answers
+    except NameError: selected_answers = []
     # check if required vars are there, otherwise back to previous page 
     if action == None:
         res = make_response(redirect('/index'))
     elif action == 'edit':
+        # get answers if selected type is question
+        if selected_type == 'question':
+            firestore_documents = db_ref.where('type', '==', selected_type).where('id', '==', selected_id)
+            selected_answers = []
+            for selected_document in firestore_documents.stream():
+                #doc_ref = db_ref.document(selected_document.id)
+                #questions.append(question.to_dict())
+                #print(json.dumps(selected_document.to_dict(), indent = 4))
+                #print(selected_document.to_dict()['answers'])
+                #print(selected_document.to_dict().get('answers'))
+                #selected_answers.append(selected_document.to_dict()['answers'])
+                #selected_answers.append(selected_document.to_dict().get('answers'))
+                selected_answers = selected_document.to_dict().get('answers')
         res = make_response(render_template('data_maintenance.html',
                 selected_type = selected_type,
                 selected_id = selected_id,
                 selected_name = selected_name,
                 selected_parent_id = selected_parent_id,
+                selected_question = selected_question,
+                selected_answers = selected_answers,
                 prev_action = action,
                 button_text = 'Update',
                 edit_mode=edit_mode))
@@ -437,6 +498,7 @@ def data_maintenance():
                 selected_id = ts_id,
                 selected_name = selected_name,
                 selected_parent_id = selected_parent_id,
+                selected_question = selected_question,
                 prev_action = action,
                 button_text = 'Add',
                 edit_mode=edit_mode))                
@@ -450,7 +512,28 @@ def data_maintenance():
             firestore_documents = db_ref.where('type', '==', selected_type).where('id', '==', selected_id)
             for selected_document in firestore_documents.stream():
                 doc_ref = db_ref.document(selected_document.id)
+            if selected_type != 'question':
                 doc_ref.update({u'name': selected_name})
+            else:
+                if selected_type == 'question':
+                    data = {
+                            u'id': selected_id,
+                            u'group_id': selected_parent_id,
+                            u'question': selected_question,
+                            u'type': selected_type,
+                            u'documentation': selected_documentation,
+                            u'solution_comment': selected_solution_comment,
+                            u'answers': []
+                    }
+                    #print(selected_answers)
+                    for answer in selected_answers:
+                        #print(answer["correct"])
+                        #data['answers'].append('{ "comment": "' + answer["comment"] + '", "answer": "' + answer["answer"] + '", "correct": ', answer["correct"], '}')
+                        if answer["answer"]:
+                            data['answers'].append({ 'comment': answer["comment"], 'answer': answer["answer"], 'correct': answer["correct"] })
+                        #data['answers'].append({ '"comment": "' + answer["comment"] + '", "answer": "' + answer["answer"] + '", "correct": ', answer["correct"] })
+                    print(json.dumps(data, indent = 4))
+                    doc_ref.set(data)
         elif prev_action == 'add':
             if selected_type == 'main-category':
                 data = {
@@ -472,7 +555,20 @@ def data_maintenance():
                         u'name': selected_name,
                         u'type': selected_type    
                 }
-            print(data)    
+            if selected_type == 'question':
+                data = {
+                        u'id': selected_id,
+                        u'group_id': selected_parent_id,
+                        u'question': selected_question,
+                        u'type': selected_type,
+                        u'documentation': selected_documentation,
+                        u'solution_comment': selected_solution_comment,
+                        u'answers': []
+                }
+                for answer in selected_answers:
+                    if answer["answer"]:
+                        data['answers'].append({ 'comment': answer["comment"], 'answer': answer["answer"], 'correct': answer["correct"] })
+            #print(data)    
             db_ref.add(data)
     if action != 'edit' and action != 'add':
         if selected_type == 'main-category':
