@@ -47,7 +47,7 @@
                 <div class="col-10"></div>
                 <div class="col-80">
                     <label class="big_label" for="selected_question">Question:</label>
-                    <textarea class="big_input" rows="13" cols="230" name="selected_question" required>{{ selected_question }}</textarea>
+                    <textarea class="big_input" style="white-space: pre-line" rows="6" cols="230" name="selected_question" required>{{ selected_question }}</textarea>
                 </div>
             </div>
             <div class="row">    
@@ -82,7 +82,7 @@
                 <div class="col-10"></div>
                 <div class="col-80">
                     <label class="big_label" for="selected_solution_comment">Solution comment:</label>
-                    <textarea class="big_input" rows="10" cols="230" name="selected_solution_comment">{{ selected_solution_comment }}</textarea>
+                    <textarea class="big_input" rows="2" cols="230" name="selected_solution_comment">{{ selected_solution_comment }}</textarea>
                 </div>
             </div>
 
@@ -94,14 +94,14 @@
                     <div class="col-10"></div>
                     <div class="col-80">
                         <label class="big_label" for="selected_answer_answer">Answer:</label>
-                        <textarea class="big_input" rows="5" cols="230" name="selected_answer_answer">{% if selected_answers is defined %}{% if selected_answers[idx] is defined %}{% if selected_answers[idx].answer is defined %}{{ selected_answers[idx].answer }}{% endif %}{% endif %}{% endif %}</textarea>
+                        <textarea class="big_input" rows="3" cols="230" name="selected_answer_answer">{% if selected_answers is defined %}{% if selected_answers[idx] is defined %}{% if selected_answers[idx].answer is defined %}{{ selected_answers[idx].answer }}{% endif %}{% endif %}{% endif %}</textarea>
                     </div>
                 </div>
                 <div class="row">   
                     <div class="col-10"></div>
                     <div class="col-80">
                         <label class="big_label" for="selected_answer_comment">Comment:</label>
-                        <textarea class="big_input" rows="5" cols="230" name="selected_answer_comment">{% if selected_answers is defined %}{% if selected_answers[idx] is defined %}{% if selected_answers[idx].comment is defined %}{{ selected_answers[idx].comment }}{% endif %}{% endif %}{% endif %}</textarea>
+                        <textarea class="big_input" rows="1" cols="230" name="selected_answer_comment">{% if selected_answers is defined %}{% if selected_answers[idx] is defined %}{% if selected_answers[idx].comment is defined %}{{ selected_answers[idx].comment }}{% endif %}{% endif %}{% endif %}</textarea>
                     </div>
                 </div>
                 <div class="row">   

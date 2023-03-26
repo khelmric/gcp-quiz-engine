@@ -120,7 +120,7 @@ body {
 .answer_col_answer {
   padding-left: 10px;
   padding-right: 10px;
-  width: 15%;
+  width: 35%;
 }
 
 .answer_col_correct {
@@ -164,6 +164,10 @@ body {
 .editbutton:active {
   background-color: #db0000;
   transform: translateY(4px);
+}
+
+.question_edit_list {
+  height: 30px;
 }
 
 .big_input {

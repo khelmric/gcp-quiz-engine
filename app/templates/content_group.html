@@ -33,8 +33,8 @@
         <div class="col-10"></div>
         <div class="col-80">
             <form action="/question" method="POST">
-                <input type="text" value="{{ question.id }}" name="selected_question_id" readonly>
-                <input type="text" style="width:80%;" value="{{ question.question }}" name="selected_question_text" readonly>
+                <input class="question_edit_list" type="text" value="{{ question.id }}" name="selected_question_id" readonly>
+                <input class="question_edit_list" type="text" style="width:80%;" value="{{ question.question }}" name="selected_question_text" readonly>
             </form>
         </div> 
         <div class="col-10">   

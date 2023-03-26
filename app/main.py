@@ -373,7 +373,7 @@ def result():
     # get global vars
     global edit_mode
     if request.method == 'POST':
-        res = make_response(redirect('/sub_category'))
+        res = make_response(redirect('/group'))
     else:    
         res = make_response(render_template('result.html',
                 correct_answers_percentage = result_correct_answers_percentage,
@@ -492,7 +492,18 @@ def data_maintenance():
                 button_text = 'Update',
                 edit_mode=edit_mode))
     elif action == 'add':
-        ts_id = 'm' + str(time.time())
+        if selected_type == 'main-category':
+            ts_id = 'm' + str(time.time())
+        elif selected_type == 'sub-category':
+            ts_id = 's' + str(time.time())
+        elif selected_type == 'group':
+            ts_id = 'g' + str(time.time()) 
+        elif selected_type == 'question':
+            ts_id = 'q' + str(time.time())
+        elif selected_type == 'document':
+            ts_id = 'd' + str(time.time())
+        else:
+            ts_id = 'o' + str(time.time()) 
         res = make_response(render_template('data_maintenance.html',
                 selected_type = selected_type,
                 selected_id = ts_id,

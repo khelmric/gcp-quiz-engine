@@ -2,11 +2,19 @@
 
 {% block content %}
 
+<div class="row">
+    <div class="col-30">
+        <form action="/group" method="GET">
+            <input class="actionbutton" type="submit" value="&#9665; Back">
+        </form>
+    </div>
+</div>
+<div class="row" style="height: 30px;"></div>
 <form action="/question" method="POST">
     <div class="row">
         <div class="col-100">
             <table>
-            <tr><td></td><td>{{ question_text|safe }}</td></tr>
+            <tr><td></td><td><b>{{ question_text|safe }}</b></td></tr>
             </table>
             <hr>
                 <table>
