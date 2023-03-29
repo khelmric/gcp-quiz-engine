@@ -337,10 +337,11 @@ def question():
         # create temp list for answer character ids
         answers_char = [chr(value) for value in range(64, len(questions[question_counter].get('answers'))+65)]
         # render question  
-        res = make_response(render_template('question.html', 
+        res = make_response(render_template('question.html',
             question_text = questions[question_counter].get('question'),
             question_counter = str(int(question_counter)+1),
             question_count = question_count,
+            solution_comment = questions[question_counter].get('solution_comment'),
             answers_char = answers_char,
             answers_order = answers_order,
             selected_answers = selected_answers,

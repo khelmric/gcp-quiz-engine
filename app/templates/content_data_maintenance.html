@@ -3,9 +3,9 @@
 {% block content %}
 
 <div class="row">
-    <div class="col-30">
+    <div class="col-30" style="height: 30px;">
         <form action="/group" method="GET">
-            <input class="actionbutton" type="submit" value="&#9665; Back">
+            <input class="backbutton" type="submit" value="&#9665; Back">
         </form>
     </div>
 </div>
@@ -133,7 +133,7 @@
         <div class="row">     
             <div class="col-10"></div>
             <div class="col-80"></div> 
-            <div class="col-10"><input class="editbutton" type="submit" value={{ button_text }}></div>  
+            <div class="col-10"><input class="updatebutton" type="submit" value={{ button_text }}></div>  
         </div>
         <input hidden type="text" value="{{ prev_action }}" name="prev_action"> 
         <input hidden type="text" value="apply" name="action"> 

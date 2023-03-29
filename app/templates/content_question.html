@@ -3,9 +3,9 @@
 {% block content %}
 
 <div class="row">
-    <div class="col-30">
+    <div class="col-30" style="height: 30px;">
         <form action="/group" method="GET">
-            <input class="actionbutton" type="submit" value="&#9665; Back">
+            <input class="backbutton" type="submit" value="&#9665; Back">
         </form>
     </div>
 </div>
@@ -49,12 +49,20 @@
                                 {% endif %}
                                 </i></td></tr>
                         <tr><td></td><td></td><td><hr></td><td></td><td></td></tr>
-                    {% endfor %}    
+                    {% endfor %}
                 </table>
                 <input hidden type="text" value="{{ question_counter }}" name="question_counter">
             <p></p>
         </div> 
     </div>
+    <div class="row" style="padding-bottom: 30px;">
+        <div class="col-10"></div>
+        <div class="col-90">    
+            {% if action == 'next' %}
+                {{ solution_comment|safe }}
+            {% endif %}
+        </div>
+    </div>        
     <div class="row">
         <div class="col-30">
             {% if result != 'None' %}

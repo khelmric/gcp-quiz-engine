@@ -3,9 +3,9 @@
 {% block content %}
 
 <div class="row">
-    <div class="col-30">
+    <div class="col-30" style="height: 30px;">
         <form action="/main_category" method="GET">
-            <input class="actionbutton" type="submit" value="&#9665; Back">
+            <input class="backbutton" type="submit" value="&#9665; Back">
         </form>
     </div>
 </div>
@@ -53,7 +53,7 @@
                     <input hidden type="text" value="{{ selected_sub_category_id }}" name="selected_parent_id">
                     <input hidden type="text" value="group" name="selected_type">
                     <input hidden type="text" value="add" name="action">
-                    <input class="editbutton" type="submit" value="&#10010; Add new">
+                    <input class="updatebutton" type="submit" value="&#10010; Add new">
                 </form>
             </div>
         {% endif %} 

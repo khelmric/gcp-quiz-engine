@@ -3,7 +3,7 @@
 {% block content %}
 
 <div class="row">
-    <div class="col-30"></div>
+    <div class="col-30" style="height: 45px;"></div>
 </div>
 <div class="row">   
         {% for main_category in main_categories %}
@@ -46,7 +46,7 @@
                     <input hidden type="text" value="" name="selected_name">
                     <input hidden type="text" value="main-category" name="selected_type">
                     <input hidden type="text" value="add" name="action">
-                    <input class="editbutton" type="submit" value="&#10010; Add new">
+                    <input class="updatebutton" style="right: 55px !important;" type="submit" value="&#10010; Add new">
                 </form>
             </div>
         {% endif %} 
