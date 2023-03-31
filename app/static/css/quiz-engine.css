@@ -68,6 +68,19 @@ body {
   height: 20px;
 }
 
+.passwd_field {
+  display: inline-block;
+  float: center;
+  padding-left: 50px;
+  padding-top: 9px;
+  height: 20px;
+}
+
+.white_label {
+  display: inline-block;
+  color: #fff;
+}
+
 .row{
     display:flex;
     flex-wrap:wrap;

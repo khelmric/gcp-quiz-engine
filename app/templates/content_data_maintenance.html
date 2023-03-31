@@ -106,7 +106,7 @@
                 </div>
                 <div class="row">   
                     <div class="col-10"></div>
-                    <div class="col-80">
+                    <div class="col-20">
                         <label class="big_label" for="checkbox_answer_correct{{ idx }}">Correct:</label>
                         {% if selected_answers is defined %}
                             {% if selected_answers[idx] is defined %}
@@ -126,6 +126,7 @@
                             <input class="big_input" type="checkbox" name="selected_answer_correct{{ idx }}">
                         {% endif %}   
                     </div>
+                    <div class="col-70"></div>
                 </div>
             {% endfor %}
 

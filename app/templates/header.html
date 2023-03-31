@@ -1,10 +1,19 @@
 <div class="navbar">
     <a href="/">Home</a>
+    {% if passwd_input_visible == True %}
+    <div class="passwd_field">
+        <form action="/editmode" method="POST">
+            <div class="white_label">Password:</div>
+            <input required type="password" name="passwd_input" autofocus>
+            <input type="submit" value="OK">
+        </form>
+    </div>
+    {% endif %} 
     <div class="edit_mode">
     {% if edit_mode == True %}
-        <a class="edit_mode_active" href="/editmode">&#128275;</a>
+        <a title="Edit mode" class="edit_mode_active" href="/editmode">&#128275;</a>
     {% else %} 
-        <a href="/editmode">&#128274;</a>
+        <a title="Edit mode" href="/editmode">&#128274;</a>
     {% endif %}   
     </div>
 </div>

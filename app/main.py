@@ -14,6 +14,7 @@ groups = []
 questions = []
 header_path = ""
 edit_mode = False
+edit_passwd = "admin123"
 
 # use the application default credentials to access Cloud Firestore
 cred = credentials.ApplicationDefault()
@@ -29,12 +30,15 @@ db_ref = db.collection(u'quiz-db')
 def index():
     # get global vars
     global edit_mode
+    global passwd_input_visible
     # clear variables
     main_categories.clear()
     sub_categories.clear()
     groups.clear()
     questions.clear()
     header_path=""
+    try: passwd_input_visible
+    except NameError: passwd_input_visible = False
 
     # query main categories
     firestore_main_categories = db_ref.where('type', '==', 'main-category')
@@ -54,7 +58,8 @@ def index():
     res = make_response(render_template('index.html', 
         main_categories=main_categories,
         header_path=header_path,
-        edit_mode=edit_mode
+        edit_mode=edit_mode,
+        passwd_input_visible=passwd_input_visible
         ))
     # delete all cookies
     res.set_cookie('selected_main_category_id', '', expires=0)
@@ -71,11 +76,30 @@ def index():
 @app.route('/editmode', methods = ['GET', 'POST'])
 def editmode():
     global edit_mode
-    if edit_mode == True:
-        edit_mode = False
+    global passwd_input_visible
+    try: passwd_input
+    except NameError: passwd_input = ""
+    if passwd_input_visible == True:
+        passwd_input_visible = False
+        # check password
+        if request.method == 'POST':
+            try:
+                passwd_input = request.form['passwd_input']
+            except:
+                passwd_input = ""   
+            if passwd_input == edit_passwd:
+                edit_mode = True
+            else:
+                edit_mode = False
+            print(passwd_input)    
     else:
-        edit_mode = True
-    res = make_response(redirect('/'))  
+        if edit_mode == True:
+            edit_mode = False
+        else:
+            #edit_mode = True
+            passwd_input_visible = True   
+    res = redirect(request.referrer)  
+    #res = make_response(redirect('/'))  
     #res = make_response(render_template('index.html', 
     #    main_categories=main_categories,
     #    header_path=header_path,
@@ -113,7 +137,8 @@ def main_category():
             selected_main_category_id=selected_main_category_id,
             sub_categories=sub_categories,
             header_path=header_path,
-            edit_mode=edit_mode
+            edit_mode=edit_mode,
+            passwd_input_visible=passwd_input_visible
             ))
         # delete cookies
         res.set_cookie('selected_sub_category_id', '', expires=0)
@@ -166,7 +191,8 @@ def sub_category():
             selected_sub_category_id=selected_sub_category_id,
             groups=groups,
             header_path=header_path,
-            edit_mode=edit_mode
+            edit_mode=edit_mode,
+            passwd_input_visible=passwd_input_visible
             ))
         # delete cookies
         res.set_cookie('selected_group_id', '', expires=0)
@@ -231,7 +257,8 @@ def group():
             selected_group_id=selected_group_id,
             question_count=question_count,
             header_path=header_path,
-            edit_mode=edit_mode
+            edit_mode=edit_mode,
+            passwd_input_visible=passwd_input_visible
             )) 
         # delete cookies
         res.set_cookie('question_counter', '', expires=0)
@@ -352,7 +379,8 @@ def question():
             submit_button_text = submit_button_text,
             quiz_status_bar = quiz_status_bar,
             header_path = header_path,
-            edit_mode=edit_mode
+            edit_mode=edit_mode,
+            passwd_input_visible=passwd_input_visible
             )) 
         # set cookies    
         res.set_cookie(
@@ -378,7 +406,8 @@ def result():
     else:    
         res = make_response(render_template('result.html',
                 correct_answers_percentage = result_correct_answers_percentage,
-                edit_mode=edit_mode
+                edit_mode=edit_mode,
+                passwd_input_visible=passwd_input_visible
             ))
     return res
 
@@ -491,7 +520,8 @@ def data_maintenance():
                 selected_answers = selected_answers,
                 prev_action = action,
                 button_text = 'Update',
-                edit_mode=edit_mode))
+                edit_mode=edit_mode,
+                passwd_input_visible=passwd_input_visible))
     elif action == 'add':
         if selected_type == 'main-category':
             ts_id = 'm' + str(time.time())
@@ -513,7 +543,8 @@ def data_maintenance():
                 selected_question = selected_question,
                 prev_action = action,
                 button_text = 'Add',
-                edit_mode=edit_mode))                
+                edit_mode=edit_mode,
+                passwd_input_visible=passwd_input_visible))                
     elif action == 'delete':
         firestore_documents = db_ref.where('type', '==', selected_type).where('id', '==', selected_id)
         for selected_document in firestore_documents.stream():
