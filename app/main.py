@@ -1,7 +1,10 @@
 import random
 import json
 import time
+from pathlib import Path
+from wsgiref.simple_server import WSGIRequestHandler
 import firebase_admin
+from google.cloud import firestore_admin_v1, storage
 from firebase_admin import credentials
 from firebase_admin import firestore
 from flask import Flask, render_template, request, redirect, make_response
@@ -13,8 +16,11 @@ sub_categories = []
 groups = []
 questions = []
 header_path = ""
-edit_mode = False
+edit_mode = True
 edit_passwd = "admin123"
+passwd_input_visible = False
+project_id = Path('env_project_id.txt').read_text()
+suffix = Path('env_suffix.txt').read_text()
 
 # use the application default credentials to access Cloud Firestore
 cred = credentials.ApplicationDefault()
@@ -91,7 +97,7 @@ def editmode():
                 edit_mode = True
             else:
                 edit_mode = False
-            print(passwd_input)    
+            #print(passwd_input)    
     else:
         if edit_mode == True:
             edit_mode = False
@@ -164,6 +170,7 @@ def main_category():
 def sub_category():
     # get global vars
     global edit_mode
+    global passwd_input_visible
     # get cookies
     cookies = request.cookies
     selected_main_category_name = cookies.get("selected_main_category_name")
@@ -295,106 +302,111 @@ def question():
     global result_correct_answers_percentage
     global question_correct_answers
     global answer_type
-    # get cookies
-    cookies = request.cookies
-    question_counter = int(cookies.get("question_counter"))
-    action = cookies.get("action")
-    # get form inputs
-    if request.method == 'POST':
-        # next question or show results
-        if action == 'next':
-            action = 'result'
-            # increase question counter by 1 
-            question_counter = int(question_counter)+1
-            # create list for answer indexes
-            if question_counter < int(question_count):
+    try: question_count
+    except NameError: question_count = None
+    if question_count == None:
+        res = make_response(redirect('/group'))
+    else:
+        # get cookies
+        cookies = request.cookies
+        question_counter = int(cookies.get("question_counter"))
+        action = cookies.get("action")
+        # get form inputs
+        if request.method == 'POST':
+            # next question or show results
+            if action == 'next':
+                action = 'result'
+                # increase question counter by 1 
+                question_counter = int(question_counter)+1
+                # create list for answer indexes
+                if question_counter < int(question_count):
+                    answers_order = list(range(0, len(questions[question_counter].get('answers'))))
+                    # shuffle question list
+                    random.shuffle(answers_order)
+                # reset values
+                selected_answers = []
+                result = 'None'
+                submit_button_text = 'Submit'
+            elif action == 'result':
+                action = 'next'
+                # question counter will not be incresed
+                question_counter = int(question_counter)
+                # get selected answer
+                selected_answers = []
+                for answ in request.form.getlist("selected_answer"):
+                    selected_answers.append(int(answ))
+                #result = questions[question_counter].get('answers')[int(selected_answer)]['correct']
+                if sorted(selected_answers) == sorted(question_correct_answers):
+                    result = True
+                    quiz_status_bar = quiz_status_bar + '&#9989;'
+                else:
+                    result = False
+                    quiz_status_bar = quiz_status_bar + '&#10060;'
+                results.append(result)
+                result_correct_answers = len([item for item in results if item == True])
+                result_correct_answers_percentage = str(int(round(result_correct_answers / question_count * 100, 0))) + "%"
+                # Submit button text to Next
+                submit_button_text = 'Next'
+            else:
+                action = 'result'
+                # question counter will not be incresed (first run, action = None)
+                question_counter = int(question_counter)
+                # create list for answer indexes
                 answers_order = list(range(0, len(questions[question_counter].get('answers'))))
                 # shuffle question list
                 random.shuffle(answers_order)
-            # reset values
-            selected_answers = []
-            result = 'None'
-            submit_button_text = 'Submit'
-        elif action == 'result':
-            action = 'next'
-            # question counter will not be incresed
-            question_counter = int(question_counter)
-            # get selected answer
-            selected_answers = []
-            for answ in request.form.getlist("selected_answer"):
-                selected_answers.append(int(answ))
-            #result = questions[question_counter].get('answers')[int(selected_answer)]['correct']
-            if sorted(selected_answers) == sorted(question_correct_answers):
-                result = True
-                quiz_status_bar = quiz_status_bar + '&#9989;'
-            else:
-                result = False
-                quiz_status_bar = quiz_status_bar + '&#10060;'
-            results.append(result)
-            result_correct_answers = len([item for item in results if item == True])
-            result_correct_answers_percentage = str(int(round(result_correct_answers / question_count * 100, 0))) + "%"
-            # Submit button text to Next
-            submit_button_text = 'Next'
+                # reset values for the initial run
+                selected_answers = [ -1 ]
+                result = 'None'
+                submit_button_text = 'Submit'
+                quiz_status_bar = ''
+                results = []
+            if action == 'result' and question_counter < int(question_count):
+                # get current questions correct answers
+                question_correct_answers = []
+                for index, question_correct_answer in enumerate(questions[question_counter].get('answers')):
+                    if question_correct_answer['correct'] == True:
+                        question_correct_answers.append(index)
+                if len(question_correct_answers) > 1:
+                    answer_type = "checkbox"
+                else:
+                    answer_type = "radio"    
+        # check if there are questions left
+        if question_counter < int(question_count):
+            # create temp list for answer character ids
+            answers_char = [chr(value) for value in range(64, len(questions[question_counter].get('answers'))+65)]
+            # render question  
+            res = make_response(render_template('question.html',
+                question_text = questions[question_counter].get('question'),
+                question_counter = str(int(question_counter)+1),
+                question_count = question_count,
+                solution_comment = questions[question_counter].get('solution_comment'),
+                answers_char = answers_char,
+                answers_order = answers_order,
+                selected_answers = selected_answers,
+                answers = questions[question_counter].get('answers'),
+                answer_type = answer_type,
+                action = action,
+                result = result,
+                submit_button_text = submit_button_text,
+                quiz_status_bar = quiz_status_bar,
+                header_path = header_path,
+                edit_mode=edit_mode,
+                passwd_input_visible=passwd_input_visible
+                )) 
+            # set cookies    
+            res.set_cookie(
+                    'question_counter',
+                    value = str(question_counter),
+                    #secure = True
+                )
+            res.set_cookie(
+                    'action',
+                    value = action,
+                    #secure = True
+                )        
         else:
-            action = 'result'
-            # question counter will not be incresed (first run, action = None)
-            question_counter = int(question_counter)
-            # create list for answer indexes
-            answers_order = list(range(0, len(questions[question_counter].get('answers'))))
-            # shuffle question list
-            random.shuffle(answers_order)
-            # reset values for the initial run
-            selected_answers = [ -1 ]
-            result = 'None'
-            submit_button_text = 'Submit'
-            quiz_status_bar = ''
-            results = []
-        if action == 'result' and question_counter < int(question_count):
-            # get current questions correct answers
-            question_correct_answers = []
-            for index, question_correct_answer in enumerate(questions[question_counter].get('answers')):
-                if question_correct_answer['correct'] == True:
-                    question_correct_answers.append(index)
-            if len(question_correct_answers) > 1:
-                answer_type = "checkbox"
-            else:
-                answer_type = "radio"    
-    # check if there are questions left
-    if question_counter < int(question_count):
-        # create temp list for answer character ids
-        answers_char = [chr(value) for value in range(64, len(questions[question_counter].get('answers'))+65)]
-        # render question  
-        res = make_response(render_template('question.html',
-            question_text = questions[question_counter].get('question'),
-            question_counter = str(int(question_counter)+1),
-            question_count = question_count,
-            solution_comment = questions[question_counter].get('solution_comment'),
-            answers_char = answers_char,
-            answers_order = answers_order,
-            selected_answers = selected_answers,
-            answers = questions[question_counter].get('answers'),
-            answer_type = answer_type,
-            action = action,
-            result = result,
-            submit_button_text = submit_button_text,
-            quiz_status_bar = quiz_status_bar,
-            header_path = header_path,
-            edit_mode=edit_mode,
-            passwd_input_visible=passwd_input_visible
-            )) 
-        # set cookies    
-        res.set_cookie(
-                'question_counter',
-                value = str(question_counter),
-                #secure = True
-            )
-        res.set_cookie(
-                'action',
-                value = action,
-                #secure = True
-            )        
-    else:
-        res = make_response(redirect('/result'))      
+            res = make_response(redirect('/result'))      
     return res
     
 @app.route('/result', methods = ['GET', 'POST'])
@@ -575,7 +587,7 @@ def data_maintenance():
                         if answer["answer"]:
                             data['answers'].append({ 'comment': answer["comment"], 'answer': answer["answer"], 'correct': answer["correct"] })
                         #data['answers'].append({ '"comment": "' + answer["comment"] + '", "answer": "' + answer["answer"] + '", "correct": ', answer["correct"] })
-                    print(json.dumps(data, indent = 4))
+                    #print(json.dumps(data, indent = 4))
                     doc_ref.set(data)
         elif prev_action == 'add':
             if selected_type == 'main-category':
@@ -623,6 +635,112 @@ def data_maintenance():
         elif selected_type == 'question':
             res = make_response(redirect('/group'))           
     return res
+
+@app.route('/db_export', methods = ['GET', 'POST'])
+def db_export():
+    # get global vars
+    global edit_mode
+    # get form data
+    if request.method == 'POST':
+        try:
+            status = request.form['status']
+        except:
+            status = 'init'
+        if status == 'close':
+            res = make_response(redirect('/'))
+        elif status == 'start':
+            # Create a client
+            client = firestore_admin_v1.FirestoreAdminClient()
+            # Initialize request argument(s)
+            fs_request = firestore_admin_v1.ExportDocumentsRequest(
+                name="projects/" + project_id + "/databases/(default)",
+                output_uri_prefix="gs://quiz-engine-storage-db-exports-" + suffix
+            )
+            # Make the request (this could take a few minutes)
+            operation = client.export_documents(request=fs_request)
+            response = operation.result()
+            gs_location = str(response).split('"')[1]
+            status = 'done'
+    else:
+        status = 'init'
+        gs_location = 'none'        
+    if status != 'close':
+        res = make_response(render_template('db_export.html',
+            status = status,
+            gs_location = gs_location,
+            edit_mode=edit_mode,
+            passwd_input_visible=passwd_input_visible
+        ))  
+    return res
+
+
+@app.route('/db_import', methods = ['GET', 'POST'])
+def db_import():
+    # vars
+    bucket_name = "quiz-engine-storage-db-exports-" + suffix
+    global export_list
+    # global vars
+    global edit_mode
+    # get form data
+    if request.method == 'POST':
+        try:
+            status = request.form['status']
+        except:
+            status = 'none'
+        if status == 'close':
+            res = make_response(redirect('/'))
+        elif status == 'init':
+            #storage_client = storage.Client()
+            #blobs = storage_client.list_blobs(bucket_name)
+            #export_list = []
+            #export_list.clear()
+            #for blob in blobs:
+            #    object = blob.name.split("/", 1)[0]
+            #    if object not in export_list:
+            #        export_list.append(object)  
+            selected_index = request.form['selected_index']
+            #print(export_list[int(selected_index)])
+            # Create a client
+            client = firestore_admin_v1.FirestoreAdminClient()
+            # Initialize request argument(s)
+            fs_request = firestore_admin_v1.ImportDocumentsRequest(
+                name="projects/" + project_id + "/databases/(default)",
+                input_uri_prefix="gs://quiz-engine-storage-db-exports-" + suffix + "/" + export_list[int(selected_index)]
+            )
+            # Make the request (this could take a few minutes)
+            operation = client.import_documents(request=fs_request)
+            response = operation.result()
+            selected_object = export_list[int(selected_index)]
+            #export_list = []
+            #print(response)
+            status = 'done'
+            res = make_response(render_template('db_import.html',
+                export_list = export_list,
+                selected_object = selected_object,
+                status = status,
+                edit_mode=edit_mode,
+                passwd_input_visible=passwd_input_visible   
+            ))     
+    else:
+        status = 'init'
+        # get exports on the cloud storage
+        storage_client = storage.Client()
+        blobs = storage_client.list_blobs(bucket_name)
+        export_list = []
+        export_list.clear()
+        for blob in blobs:
+            object = blob.name.split("/", 1)[0]
+            if object not in export_list:
+                export_list.append(object)  
+        selected_object = 'none'   
+        res = make_response(render_template('db_import.html',
+            export_list = export_list,
+            selected_object = selected_object,
+            status = status,
+            edit_mode=edit_mode,
+            passwd_input_visible=passwd_input_visible
+        ))  
+    return res    
 
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0', port=8080)

@@ -1,0 +1,11 @@
+# Mandatory parameters
+suffix          = "0001"
+org_id          = "123456789"
+project_id      = "quiz-engine-0001"
+billing_account = "012345-6789AB-CDEFGHIJ"
+
+# Optional parameters
+project_name    = "Quiz Engine"
+location        = "us-west1"
+admin_password  = "admin123!"
+

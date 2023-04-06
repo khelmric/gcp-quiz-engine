@@ -1,3 +1,14 @@
+# create local env files for python
+resource "local_file" "project-id" {
+  content = var.project_id
+  filename = "app/env_project_id.txt"
+}
+
+resource "local_file" "suffix" {
+  content = var.suffix
+  filename = "app/env_suffix.txt"
+}
+
 resource "google_service_account" "quiz-app-sa" {
   project                     = var.project_id
   account_id   = "quiz-app-account"
@@ -7,11 +18,8 @@ resource "google_service_account" "quiz-app-sa" {
 
 resource "google_project_iam_member" "quiz_app_sa_roles" {
   for_each = toset([
-    "roles/storage.objectViewer",
-    "roles/compute.networkUser",
-    "roles/appengine.appAdmin",
-    "roles/appengine.appCreator",
-    "roles/datastore.owner"
+    "roles/datastore.owner",
+    "roles/editor"
   ])
   role = each.key
   project = google_service_account.quiz-app-sa.project
@@ -77,8 +85,8 @@ resource "google_app_engine_standard_app_version" "quiz_app_v1" {
   }
 
   delete_service_on_destroy = true
-#  service_account = google_service_account.quiz-app-sa.email
-  service_account = "${var.project_id}@appspot.gserviceaccount.com"
+  service_account = google_service_account.quiz-app-sa.email
+#  service_account = "${var.project_id}@appspot.gserviceaccount.com"
 
   depends_on = [
     google_storage_bucket_object.upload-app

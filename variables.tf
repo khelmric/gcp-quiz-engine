@@ -33,3 +33,10 @@ variable "suffix" {
   type        = string
   default     = null
 }
+
+variable "admin_password" {
+  description = "Admin password to enable edit functions."
+  type        = string
+  default     = null
+  sensitive   = true
+}

@@ -1,5 +1,9 @@
 <div class="navbar">
-    <a href="/">Home</a>
+    <a class="navbar_button" href="/">Home</a>
+    {% if edit_mode == True %}
+        <a class="navbar_edit_button" href="/db_export">Export</a>
+        <a class="navbar_edit_button" href="/db_import">Import</a>
+    {% endif %} 
     {% if passwd_input_visible == True %}
     <div class="passwd_field">
         <form action="/editmode" method="POST">

@@ -10,9 +10,9 @@ resource "google_storage_bucket" "quiz_storage_app" {
   ]
 }
 
-resource "google_storage_bucket" "quiz_storage_images" {
+resource "google_storage_bucket" "quiz_storage_db_exports" {
   project         = var.project_id
-  name            = "quiz-engine-storage-images-${var.suffix}"
+  name            = "quiz-engine-storage-db-exports-${var.suffix}"
   storage_class   = "REGIONAL"
   location        = var.location
 

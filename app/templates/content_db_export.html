@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+    <div class="row">
+        <div class="col-30"><b>DB export</b></div>
+        
+        <div class="col-70">
+            {% if status == 'init' %}
+                <table>
+                    <tr><td>Create an export of the entire database (this could take few minutes).</td></tr>
+                </table>
+            {% endif %}
+            {% if status == 'done' %}
+                <table>
+                    <tr><td><b>Status:</b></td><td>done</td></tr>
+                    <tr><td><b>Output location:</b></td><td>{{ gs_location }}</td></tr>
+                </table>
+            {% endif %}
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-30"></div>
+        <div class="col-70">
+            {% if status == 'init' %}
+                <form action="/db_export" method="POST">
+                    <input hidden type="text" value="start" name="status">
+                    <input class="actionbutton" type="submit" value="Start">
+                </form>
+            {% endif %}
+            {% if status == 'done' %}
+                <form action="/db_export" method="POST">
+                    <input hidden type="text" value="close" name="status">
+                    <input class="actionbutton" type="submit" value="Close">
+                </form>
+            {% endif %}            
+        </div>
+    </div>
+
+
+
+{% endblock %}
+

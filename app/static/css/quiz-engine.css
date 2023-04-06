@@ -38,17 +38,12 @@ body {
     border:#0048ba;
 }
 
-.edit_mode_active {
-  background-color:#db0000;
-  text-align: right;
-}
-
 .navbar {
   overflow: hidden;
   background-color: #0f71ff;
 }
 
-.navbar a {
+.navbar_button {
   float: left;
   color: #fff;
   text-align: center;
@@ -56,21 +51,60 @@ body {
   text-decoration: none;
 }
 
-.navbar a:hover {
+.navbar_button:hover {
   background-color: #000067;
 }
 
+.navbar_edit_button {
+  float: left;
+  color: #fff;
+  text-align: center;
+  padding: 10px 20px;
+  text-decoration: none;
+  background-color: #db0000;
+}
+
+.navbar_edit_button:hover {
+  background-color: #980000;
+}
+
+
+
+.edit_mode, .edit_mode_active{
+  float: right;
+  font-size: 22px;
+  text-align: center;
+  padding: 2px;
+  text-decoration: none;
+  margin: 0px;
+}
+
+.edit_mode_active {
+  background-color:#db0000;
+}
+
+
+/*
 .edit_mode {
   float: right;
-  font-size: 24px;
-  padding: 0px!important;
-  margin-top: -6px!important;
-  height: 20px;
+  font-size: 22px;
+  text-align: center;
+  padding: 4px;
+  text-decoration: none;
+  margin: 0px;
 }
+
+.edit_mode_active {
+  background-color:#db0000;
+  text-align: right;
+  padding: 6px;
+  margin: 0px;
+}
+*/
 
 .passwd_field {
   display: inline-block;
-  float: center;
+  /*float: center;*/
   padding-left: 50px;
   padding-top: 10px;
   height: 20px;

@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+    <div class="row">
+        <div class="col-30"><b>DB import</b></div>
+        
+        <div class="col-70">
+            {% if status == 'init' %}
+                <table>
+                    <tr><td>Select the storage object to be imported:</td></tr>
+                    <tr><td>(this could take few minutes)</td></tr>
+                </table>
+            {% endif %}
+            {% if status == 'done' %}
+                <table>
+                    <tr><td><b>Status:</b></td><td>done</td></tr>
+                    <tr><td colspan="2">Storage object {{ selected_object }} was imported.</td></tr>
+                </table>
+            {% endif %}
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-30"></div>
+        <div class="col-70">
+            {% if status == 'init' %}
+                <form action="/db_import" method="POST">
+                    <table>
+                        {% for export_item in export_list %}
+                            <tr><td><input type="radio" value="{{ loop.index-1 }}" name="selected_index" required></td>
+                                <td>{{ export_item }}</td>
+                            </tr>
+                        {% endfor %}
+                    </table>
+                    <input hidden type="text" value="init" name="status">
+                    <input class="actionbutton" type="submit" value="Start">
+                </form>
+            {% endif %}
+            {% if status == 'done' %}
+                <form action="/db_import" method="POST">
+                    <input hidden type="text" value="close" name="status">
+                    <input class="actionbutton" type="submit" value="Close">
+                </form>
+            {% endif %}            
+        </div>
+    </div>
+
+
+
+{% endblock %}
+
