@@ -32,6 +32,12 @@
                             </tr>
                         {% endfor %}
                     </table>
+                    <hr>
+                    <table>    
+                        <tr>
+                            <td><input type="checkbox" name="delete_db"></td><td><b>Delete DB before import</b></td>
+                        </tr>
+                    </table>
                     <input hidden type="text" value="init" name="status">
                     <input class="actionbutton" type="submit" value="Start">
                 </form>

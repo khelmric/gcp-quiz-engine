@@ -20,7 +20,8 @@ resource "google_project_service" "quiz_project_services" {
     "cloudbuild.googleapis.com",
     "artifactregistry.googleapis.com",
     "appengine.googleapis.com",
-    "orgpolicy.googleapis.com"
+    "orgpolicy.googleapis.com",
+    "secretmanager.googleapis.com"
   ])
   service = each.key
 

@@ -4,7 +4,7 @@ import time
 from pathlib import Path
 from wsgiref.simple_server import WSGIRequestHandler
 import firebase_admin
-from google.cloud import firestore_admin_v1, storage
+from google.cloud import firestore_admin_v1, storage, secretmanager
 from firebase_admin import credentials
 from firebase_admin import firestore
 from flask import Flask, render_template, request, redirect, make_response
@@ -17,7 +17,6 @@ groups = []
 questions = []
 header_path = ""
 edit_mode = True
-edit_passwd = "admin123"
 passwd_input_visible = False
 project_id = Path('env_project_id.txt').read_text()
 suffix = Path('env_suffix.txt').read_text()
@@ -29,6 +28,17 @@ firebase_admin.initialize_app(cred)
 # init quiz-db
 db = firestore.client()
 db_ref = db.collection(u'quiz-db')
+
+# get the admin password secret
+secretmanager_client = secretmanager.SecretManagerServiceClient()
+secret_detail = f"projects/{project_id}/secrets/admin-password/versions/latest"
+response = secretmanager_client.access_secret_version(request={"name": secret_detail})
+admin_passwd = response.payload.data.decode("UTF-8")
+#print(data)
+#print("Data: {}".format(data))
+
+###########################################################################
+# define routes
 
 @app.route('/', methods = ['GET', 'POST'])
 
@@ -93,7 +103,7 @@ def editmode():
                 passwd_input = request.form['passwd_input']
             except:
                 passwd_input = ""   
-            if passwd_input == edit_passwd:
+            if passwd_input == admin_passwd:
                 edit_mode = True
             else:
                 edit_mode = False
@@ -678,6 +688,7 @@ def db_export():
 def db_import():
     # vars
     bucket_name = "quiz-engine-storage-db-exports-" + suffix
+    delete_db = 'off'
     global export_list
     # global vars
     global edit_mode
@@ -687,6 +698,10 @@ def db_import():
             status = request.form['status']
         except:
             status = 'none'
+        try:
+            delete_db = request.form['delete_db']
+        except:
+            delete_db = 'off'
         if status == 'close':
             res = make_response(redirect('/'))
         elif status == 'init':
@@ -698,6 +713,9 @@ def db_import():
             #    object = blob.name.split("/", 1)[0]
             #    if object not in export_list:
             #        export_list.append(object)  
+            print(delete_db)
+            if delete_db == 'on':
+                delete_collection(db_ref, 10)
             selected_index = request.form['selected_index']
             #print(export_list[int(selected_index)])
             # Create a client
@@ -741,6 +759,18 @@ def db_import():
             passwd_input_visible=passwd_input_visible
         ))  
     return res    
+
+def delete_collection(coll_ref, batch_size):
+    docs = coll_ref.list_documents(page_size=batch_size)
+    deleted = 0
+
+    for doc in docs:
+        print(f'Deleting doc {doc.id} => {doc.get().to_dict()}')
+        doc.delete()
+        deleted = deleted + 1
+
+    if deleted >= batch_size:
+        return delete_collection(coll_ref, batch_size)
 
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0', port=8080)
