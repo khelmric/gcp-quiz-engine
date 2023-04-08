@@ -8,7 +8,7 @@
         <div class="col-70">
             {% if status == 'init' %}
                 <table>
-                    <tr><td>Select the storage object to be imported:</td></tr>
+                    <tr><td>Select the database export to be imported:</td></tr>
                     <tr><td>(this could take few minutes)</td></tr>
                 </table>
             {% endif %}
@@ -35,7 +35,7 @@
                     <hr>
                     <table>    
                         <tr>
-                            <td><input type="checkbox" name="delete_db"></td><td><b>Delete DB before import</b></td>
+                            <td><input type="checkbox" name="delete_db"></td><td><b>Delete current database before import</b></td>
                         </tr>
                     </table>
                     <input hidden type="text" value="init" name="status">

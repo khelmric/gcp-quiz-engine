@@ -3,7 +3,11 @@ resource "google_secret_manager_secret" "admin-password" {
   project         = var.project_id
   secret_id = "admin-password"
   replication {
-    automatic = true
+    user_managed {
+      replicas {
+        location = var.location
+      }
+    }
   }
   labels = {
     label = "quiz-engine"
