@@ -30,6 +30,10 @@ resource "google_project_service" "quiz_project_services" {
     create = "30m"
     update = "40m"
   }
+
+  depends_on = [
+    google_project.quiz_project
+  ]
 }
 
 resource "google_project_organization_policy" "org_policy_resource_location" {
