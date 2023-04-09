@@ -41,8 +41,8 @@ variable "admin_password" {
   sensitive   = true
 }
 
-variable "access_list" {
-  description = "List of accounts to get access on the website."
-  type        = list(string)
-  default     = [ "allUsers" ]
+variable "web_app_member" {
+  description = "Account to get access on the website."
+  type        = string
+  default     = "allUsers"
 }

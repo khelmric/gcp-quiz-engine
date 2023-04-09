@@ -17,5 +17,5 @@ resource "google_iap_web_type_app_engine_iam_member" "member" {
   project = google_app_engine_application.quiz_app.project
   app_id = google_app_engine_application.quiz_app.app_id
   role = "roles/iap.httpsResourceAccessor"
-  members = var.access_list
+  member = var.web_app_member
 }
