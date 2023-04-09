@@ -41,8 +41,14 @@ variable "admin_password" {
   sensitive   = true
 }
 
-variable "web_app_member" {
-  description = "Account to get access on the website."
-  type        = string
-  default     = "allUsers"
+variable "web_app_members" {
+  description = "Accounts to get access on the website."
+  type        = list(string)
+  default     = [ "allUsers" ]
+}
+
+variable "max_instances" {
+  description = "Max intances for App Engine."
+  type        = number
+  default     = 2
 }

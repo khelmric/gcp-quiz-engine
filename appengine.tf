@@ -55,8 +55,21 @@ resource "google_app_engine_application" "quiz_app" {
   location_id = var.location
   database_type = "CLOUD_FIRESTORE"
 
+  iap {
+    oauth2_client_id = google_iap_client.quiz_engine_client.client_id
+    oauth2_client_secret = google_iap_client.quiz_engine_client.secret
+  }
+
   depends_on = [
     google_project_service.quiz_project_services
+  ]
+}
+
+resource "time_sleep" "wait_after_app_engine_application" {
+  create_duration = "30s"
+
+  depends_on = [
+    google_app_engine_application.quiz_app
   ]
 }
 
@@ -80,7 +93,7 @@ resource "google_app_engine_standard_app_version" "quiz_app_v1" {
   }
   automatic_scaling {
     standard_scheduler_settings {
-      max_instances = 2
+      max_instances = var.max_instances
     }
   }
   handlers {
@@ -94,11 +107,11 @@ resource "google_app_engine_standard_app_version" "quiz_app_v1" {
 
   delete_service_on_destroy = true
   service_account = google_service_account.quiz-app-sa.email
-#  service_account = "${var.project_id}@appspot.gserviceaccount.com"
 
   depends_on = [
     google_storage_bucket_object.upload-app,
-    google_app_engine_application.quiz_app
+    google_app_engine_application.quiz_app,
+    time_sleep.wait_after_app_engine_application
   ]
 }
 

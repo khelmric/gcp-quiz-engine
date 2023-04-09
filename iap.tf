@@ -9,13 +9,17 @@ resource "google_iap_brand" "quiz_engine_brand" {
 }
 
 resource "google_iap_client" "quiz_engine_client" {
-  display_name = "IAP-App-Engine-app"
+  display_name = "IAP-Quiz-Engine-app"
   brand        =  google_iap_brand.quiz_engine_brand.name
 }
 
-resource "google_iap_web_type_app_engine_iam_member" "member" {
+resource "google_iap_web_type_app_engine_iam_binding" "web_app_members" {
   project = google_app_engine_application.quiz_app.project
   app_id = google_app_engine_application.quiz_app.app_id
   role = "roles/iap.httpsResourceAccessor"
-  member = var.web_app_member
+  members = var.web_app_members
+
+  depends_on = [
+    google_app_engine_application.quiz_app
+  ]
 }
