@@ -54,6 +54,10 @@ resource "google_app_engine_application" "quiz_app" {
   project  = var.project_id
   location_id = var.location
   database_type = "CLOUD_FIRESTORE"
+
+  depends_on = [
+    google_project_service.quiz_project_services
+  ]
 }
 
 # Create a Python App Engine service
@@ -93,7 +97,8 @@ resource "google_app_engine_standard_app_version" "quiz_app_v1" {
 #  service_account = "${var.project_id}@appspot.gserviceaccount.com"
 
   depends_on = [
-    google_storage_bucket_object.upload-app
+    google_storage_bucket_object.upload-app,
+    google_app_engine_application.quiz_app
   ]
 }
 

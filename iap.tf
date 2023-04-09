@@ -9,12 +9,12 @@ resource "google_iap_brand" "quiz_engine_brand" {
 }
 
 resource "google_iap_client" "quiz_engine_client" {
-  display_name = "Quiz Engine"
+  display_name = "IAP-App-Engine-app"
   brand        =  google_iap_brand.quiz_engine_brand.name
 }
 
-resource "google_iap_web_type_app_engine_iam_binding" "binding" {
-  project = var.project_id
+resource "google_iap_web_type_app_engine_iam_member" "member" {
+  project = google_app_engine_application.quiz_app.project
   app_id = google_app_engine_application.quiz_app.app_id
   role = "roles/iap.httpsResourceAccessor"
   members = var.access_list

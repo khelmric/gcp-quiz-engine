@@ -42,5 +42,8 @@ resource "google_project_organization_policy" "org_policy_resource_location" {
     }
   }
 
+  depends_on = [
+    google_project_service.quiz_project_services
+  ]
 }
 
