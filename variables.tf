@@ -41,12 +41,6 @@ variable "admin_password" {
   sensitive   = true
 }
 
-variable "support_email" {
-  description = "Support email displayed on the OAuth consent screen."
-  type        = string
-  default     = null
-}
-
 variable "access_list" {
   description = "List of accounts to get access on the website."
   type        = list(string)
