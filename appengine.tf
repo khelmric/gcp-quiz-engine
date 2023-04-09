@@ -13,13 +13,17 @@ resource "google_service_account" "quiz-app-sa" {
   project                     = var.project_id
   account_id   = "quiz-app-account"
   display_name = "Quiz App Service Account"
+  depends_on = [
+    google_project_service.quiz_project_services
+  ]
 }
 
 
 resource "google_project_iam_member" "quiz_app_sa_roles" {
   for_each = toset([
     "roles/datastore.owner",
-    "roles/editor"
+    "roles/editor",
+    "roles/secretmanager.secretAccessor"
   ])
   role = each.key
   project = google_service_account.quiz-app-sa.project

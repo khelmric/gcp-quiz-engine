@@ -1,7 +1,11 @@
 resource "google_iap_brand" "quiz_engine_brand" {
   project           = var.project_id
-  support_email     = var.support_email
+  support_email     = data.google_client_openid_userinfo.my-user.email
   application_title = "Quiz Engine"
+
+  depends_on = [
+    google_project_service.quiz_project_services
+  ]
 }
 
 resource "google_iap_client" "quiz_engine_client" {
