@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="row">
+    <h3>Error</h3>
+</div>
+<div class="row">
+    <div class="col-30"></div>
+    <div class="col-50">
+        <h3>&#9888; There was an unexpected error.</h3>
+            <form action="/error" method="POST">
+                <input class="actionbutton" type="submit" value="Close">
+            </form>
+    </div> 
+
+</div>
+
+{% endblock %}

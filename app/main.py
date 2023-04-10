@@ -34,8 +34,6 @@ secretmanager_client = secretmanager.SecretManagerServiceClient()
 secret_detail = f"projects/{project_id}/secrets/admin-password/versions/latest"
 response = secretmanager_client.access_secret_version(request={"name": secret_detail})
 admin_passwd = response.payload.data.decode("UTF-8")
-#print(data)
-#print("Data: {}".format(data))
 
 ###########################################################################
 # define routes
@@ -60,23 +58,16 @@ def index():
     firestore_main_categories = db_ref.where('type', '==', 'main-category')
     for main_category in firestore_main_categories.stream():
         main_categories.append((main_category.to_dict()))
-    # get cookies
-#    cookies = request.cookies
-    # get cookies for the main category
-#    selected_main_category_id = ""
-#    selected_main_category_name = ""
-#    selected_sub_category_id = ""
-#    selected_sub_category_name = ""
-#    selected_group_id = ""
-#    selected_group_name = ""  
-
     # render index  
-    res = make_response(render_template('index.html', 
-        main_categories=main_categories,
-        header_path=header_path,
-        edit_mode=edit_mode,
-        passwd_input_visible=passwd_input_visible
+    try:
+        res = make_response(render_template('index.html', 
+            main_categories=main_categories,
+            header_path=header_path,
+            edit_mode=edit_mode,
+            passwd_input_visible=passwd_input_visible
         ))
+    except: 
+            res = make_response(redirect('/error'))    
     # delete all cookies
     res.set_cookie('selected_main_category_id', '', expires=0)
     res.set_cookie('selected_main_category_name', '', expires=0)
@@ -115,12 +106,6 @@ def editmode():
             #edit_mode = True
             passwd_input_visible = True   
     res = redirect(request.referrer)  
-    #res = make_response(redirect('/'))  
-    #res = make_response(render_template('index.html', 
-    #    main_categories=main_categories,
-    #    header_path=header_path,
-    #    edit_mode=edit_mode
-    #    ))     
     return res
 
 @app.route('/main_category', methods = ['GET', 'POST'])
@@ -138,7 +123,7 @@ def main_category():
         selected_main_category_name = request.form['selected_main_category_name']
     # check if required vars are there, otherwise back to previous page 
     if selected_main_category_name == None or selected_main_category_id == None:
-        res = make_response(redirect('/home'))
+        res = make_response(redirect('/index'))
     else: 
         header_path=selected_main_category_name
         # query sub categories
@@ -148,14 +133,17 @@ def main_category():
         for sub_category in firestore_sub_categories.stream():
             sub_categories.append((sub_category.to_dict()))    
         # render main_category    
-        res = make_response(render_template('main_category.html', 
-            main_categories=main_categories,
-            selected_main_category_id=selected_main_category_id,
-            sub_categories=sub_categories,
-            header_path=header_path,
-            edit_mode=edit_mode,
-            passwd_input_visible=passwd_input_visible
+        try:
+            res = make_response(render_template('main_category.html', 
+                main_categories=main_categories,
+                selected_main_category_id=selected_main_category_id,
+                sub_categories=sub_categories,
+                header_path=header_path,
+                edit_mode=edit_mode,
+                passwd_input_visible=passwd_input_visible
             ))
+        except: 
+            res = make_response(redirect('/error'))    
         # delete cookies
         res.set_cookie('selected_sub_category_id', '', expires=0)
         res.set_cookie('selected_sub_category_name', '', expires=0)
@@ -204,13 +192,16 @@ def sub_category():
         for group in firestore_groups.stream():
             groups.append((group.to_dict()))    
         # render sub_category    
-        res = make_response(render_template('sub_category.html', 
-            selected_sub_category_id=selected_sub_category_id,
-            groups=groups,
-            header_path=header_path,
-            edit_mode=edit_mode,
-            passwd_input_visible=passwd_input_visible
+        try:
+            res = make_response(render_template('sub_category.html', 
+                selected_sub_category_id=selected_sub_category_id,
+                groups=groups,
+                header_path=header_path,
+                edit_mode=edit_mode,
+                passwd_input_visible=passwd_input_visible
             ))
+        except: 
+            res = make_response(redirect('/error'))    
         # delete cookies
         res.set_cookie('selected_group_id', '', expires=0)
         res.set_cookie('selected_group_name', '', expires=0)
@@ -260,23 +251,24 @@ def group():
         questions.clear()
         for question in firestore_questions.stream():
             questions.append(question.to_dict())
-            #print(json.dumps(question.to_dict(), indent = 4))
-            #print(question.to_dict())
             question_count = question_count + 1
         # shuffle question list
         random.shuffle(questions)    
         # render group    
-        res = make_response(render_template('group.html', 
-            questions=questions,
-            selected_main_category_name=selected_main_category_name,
-            selected_sub_category_name=selected_sub_category_name,
-            selected_group_name=selected_group_name,
-            selected_group_id=selected_group_id,
-            question_count=question_count,
-            header_path=header_path,
-            edit_mode=edit_mode,
-            passwd_input_visible=passwd_input_visible
-            )) 
+        try:
+            res = make_response(render_template('group.html', 
+                questions=questions,
+                selected_main_category_name=selected_main_category_name,
+                selected_sub_category_name=selected_sub_category_name,
+                selected_group_name=selected_group_name,
+                selected_group_id=selected_group_id,
+                question_count=question_count,
+                header_path=header_path,
+                edit_mode=edit_mode,
+                passwd_input_visible=passwd_input_visible
+                )) 
+        except: 
+            res = make_response(redirect('/error'))        
         # delete cookies
         res.set_cookie('question_counter', '', expires=0)
         res.set_cookie('action', '', expires=0)    
@@ -314,6 +306,10 @@ def question():
     global answer_type
     try: question_count
     except NameError: question_count = None
+    try: question_correct_answers
+    except NameError: question_correct_answers = []
+    try: quiz_status_bar
+    except NameError: quiz_status_bar = ""
     if question_count == None:
         res = make_response(redirect('/group'))
     else:
@@ -345,7 +341,6 @@ def question():
                 selected_answers = []
                 for answ in request.form.getlist("selected_answer"):
                     selected_answers.append(int(answ))
-                #result = questions[question_counter].get('answers')[int(selected_answer)]['correct']
                 if sorted(selected_answers) == sorted(question_correct_answers):
                     result = True
                     quiz_status_bar = quiz_status_bar + '&#9989;'
@@ -426,11 +421,14 @@ def result():
     if request.method == 'POST':
         res = make_response(redirect('/group'))
     else:    
-        res = make_response(render_template('result.html',
+        try:
+            res = make_response(render_template('result.html',
                 correct_answers_percentage = result_correct_answers_percentage,
                 edit_mode=edit_mode,
                 passwd_input_visible=passwd_input_visible
             ))
+        except: 
+            res = make_response(redirect('/error'))    
     return res
 
 @app.route('/data_maintenance', methods = ['GET', 'POST'])
@@ -441,6 +439,23 @@ def data_maintenance():
     selected_answers_answer = []
     selected_answers_comment = []
     selected_answers_correct = []
+    # check if variables exist, handle exceptions
+    try: action
+    except NameError: action = None
+    try: prev_action
+    except NameError: prev_action = None
+    try: selected_id
+    except NameError: selected_id = None
+    try: selected_type
+    except NameError: selected_type = None
+    try: selected_name
+    except NameError: selected_name = None
+    try: selected_parent_id
+    except NameError: selected_parent_id = None
+    try: selected_question
+    except NameError: selected_question = None
+    try: selected_answers
+    except NameError: selected_answers = []
     # get form data
     if request.method == 'POST':
         selected_type = request.form['selected_type']
@@ -493,29 +508,8 @@ def data_maintenance():
                 selected_answers_correct.append(False)
         if selected_answers_answer:   
             selected_answers.clear()
-        #print(len(selected_answers_answer))
-        #print(len(selected_answers_comment))
-        #print(len(selected_answers_correct))
         for idx, ans in enumerate(selected_answers_answer):
             selected_answers.append({ 'comment': selected_answers_comment[idx], 'answer': ans, 'correct': selected_answers_correct[idx] })    
-        #    selected_answers = []
-    # check if variables exist, handle exceptions
-    try: action
-    except NameError: action = None
-    try: prev_action
-    except NameError: prev_action = None
-    try: selected_id
-    except NameError: selected_id = None
-    try: selected_type
-    except NameError: selected_type = None
-    try: selected_name
-    except NameError: selected_name = None
-    try: selected_parent_id
-    except NameError: selected_parent_id = None
-    try: selected_question
-    except NameError: selected_question = None
-    try: selected_answers
-    except NameError: selected_answers = []
     # check if required vars are there, otherwise back to previous page 
     if action == None:
         res = make_response(redirect('/index'))
@@ -525,15 +519,9 @@ def data_maintenance():
             firestore_documents = db_ref.where('type', '==', selected_type).where('id', '==', selected_id)
             selected_answers = []
             for selected_document in firestore_documents.stream():
-                #doc_ref = db_ref.document(selected_document.id)
-                #questions.append(question.to_dict())
-                #print(json.dumps(selected_document.to_dict(), indent = 4))
-                #print(selected_document.to_dict()['answers'])
-                #print(selected_document.to_dict().get('answers'))
-                #selected_answers.append(selected_document.to_dict()['answers'])
-                #selected_answers.append(selected_document.to_dict().get('answers'))
                 selected_answers = selected_document.to_dict().get('answers')
-        res = make_response(render_template('data_maintenance.html',
+        try:
+            res = make_response(render_template('data_maintenance.html',
                 selected_type = selected_type,
                 selected_id = selected_id,
                 selected_name = selected_name,
@@ -543,7 +531,10 @@ def data_maintenance():
                 prev_action = action,
                 button_text = 'Update',
                 edit_mode=edit_mode,
-                passwd_input_visible=passwd_input_visible))
+                passwd_input_visible=passwd_input_visible
+            ))
+        except: 
+            res = make_response(redirect('/error'))    
     elif action == 'add':
         if selected_type == 'main-category':
             ts_id = 'm' + str(time.time())
@@ -557,7 +548,8 @@ def data_maintenance():
             ts_id = 'd' + str(time.time())
         else:
             ts_id = 'o' + str(time.time()) 
-        res = make_response(render_template('data_maintenance.html',
+        try:
+            res = make_response(render_template('data_maintenance.html',
                 selected_type = selected_type,
                 selected_id = ts_id,
                 selected_name = selected_name,
@@ -566,7 +558,10 @@ def data_maintenance():
                 prev_action = action,
                 button_text = 'Add',
                 edit_mode=edit_mode,
-                passwd_input_visible=passwd_input_visible))                
+                passwd_input_visible=passwd_input_visible
+            ))
+        except: 
+            res = make_response(redirect('/error'))                 
     elif action == 'delete':
         firestore_documents = db_ref.where('type', '==', selected_type).where('id', '==', selected_id)
         for selected_document in firestore_documents.stream():
@@ -590,14 +585,9 @@ def data_maintenance():
                             u'solution_comment': selected_solution_comment,
                             u'answers': []
                     }
-                    #print(selected_answers)
                     for answer in selected_answers:
-                        #print(answer["correct"])
-                        #data['answers'].append('{ "comment": "' + answer["comment"] + '", "answer": "' + answer["answer"] + '", "correct": ', answer["correct"], '}')
                         if answer["answer"]:
                             data['answers'].append({ 'comment': answer["comment"], 'answer': answer["answer"], 'correct': answer["correct"] })
-                        #data['answers'].append({ '"comment": "' + answer["comment"] + '", "answer": "' + answer["answer"] + '", "correct": ', answer["correct"] })
-                    #print(json.dumps(data, indent = 4))
                     doc_ref.set(data)
         elif prev_action == 'add':
             if selected_type == 'main-category':
@@ -675,12 +665,15 @@ def db_export():
         status = 'init'
         gs_location = 'none'        
     if status != 'close':
-        res = make_response(render_template('db_export.html',
-            status = status,
-            gs_location = gs_location,
-            edit_mode=edit_mode,
-            passwd_input_visible=passwd_input_visible
-        ))  
+        try:
+            res = make_response(render_template('db_export.html',
+                status = status,
+                gs_location = gs_location,
+                edit_mode=edit_mode,
+                passwd_input_visible=passwd_input_visible
+            ))  
+        except: 
+            res = make_response(redirect('/error'))    
     return res
 
 
@@ -705,19 +698,9 @@ def db_import():
         if status == 'close':
             res = make_response(redirect('/'))
         elif status == 'init':
-            #storage_client = storage.Client()
-            #blobs = storage_client.list_blobs(bucket_name)
-            #export_list = []
-            #export_list.clear()
-            #for blob in blobs:
-            #    object = blob.name.split("/", 1)[0]
-            #    if object not in export_list:
-            #        export_list.append(object)  
-            print(delete_db)
             if delete_db == 'on':
                 delete_collection(db_ref, 10)
             selected_index = request.form['selected_index']
-            #print(export_list[int(selected_index)])
             # Create a client
             client = firestore_admin_v1.FirestoreAdminClient()
             # Initialize request argument(s)
@@ -729,16 +712,17 @@ def db_import():
             operation = client.import_documents(request=fs_request)
             response = operation.result()
             selected_object = export_list[int(selected_index)]
-            #export_list = []
-            #print(response)
             status = 'done'
-            res = make_response(render_template('db_import.html',
-                export_list = export_list,
-                selected_object = selected_object,
-                status = status,
-                edit_mode=edit_mode,
-                passwd_input_visible=passwd_input_visible   
-            ))     
+            try:
+                res = make_response(render_template('db_import.html',
+                    export_list = export_list,
+                    selected_object = selected_object,
+                    status = status,
+                    edit_mode=edit_mode,
+                    passwd_input_visible=passwd_input_visible   
+                ))     
+            except: 
+                res = make_response(redirect('/error'))    
     else:
         status = 'init'
         # get exports on the cloud storage
@@ -751,14 +735,31 @@ def db_import():
             if object not in export_list:
                 export_list.append(object)  
         selected_object = 'none'   
-        res = make_response(render_template('db_import.html',
-            export_list = export_list,
-            selected_object = selected_object,
-            status = status,
-            edit_mode=edit_mode,
-            passwd_input_visible=passwd_input_visible
-        ))  
-    return res    
+        try:
+            res = make_response(render_template('db_import.html',
+                export_list = export_list,
+                selected_object = selected_object,
+                status = status,
+                edit_mode=edit_mode,
+                passwd_input_visible=passwd_input_visible
+            )) 
+        except: 
+            res = make_response(redirect('/error'))
+    return res
+
+
+@app.route('/error', methods = ['GET', 'POST'])
+def error():
+    # get global vars
+    global edit_mode
+    if request.method == 'POST':
+        res = make_response(redirect('/'))
+    else:    
+        res = make_response(render_template('error.html',
+                edit_mode=edit_mode,
+                passwd_input_visible=passwd_input_visible
+            ))
+    return res
 
 def delete_collection(coll_ref, batch_size):
     docs = coll_ref.list_documents(page_size=batch_size)
@@ -772,5 +773,6 @@ def delete_collection(coll_ref, batch_size):
     if deleted >= batch_size:
         return delete_collection(coll_ref, batch_size)
 
+
 if __name__ == '__main__':
-    app.run(debug=True, host='0.0.0.0', port=8080)
+    app.run(debug=False, host='0.0.0.0', port=8080)
