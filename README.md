@@ -22,8 +22,11 @@ The main components are:
 This noSQL database is used for storing all the documents (categories, groups, questions).
 
 ### Cloud Storage
+- Storage bucket ***quiz-engine-storage-app***: location for the `app.zip` file, used by the App Engine
+- Storage bucket ***quiz-engine-storage-db-exports***: location for the database exports, created by the admin user
 
 ### Identity-Aware Proxy
+
 
 ### Secret Manager
 
