@@ -31,9 +31,14 @@ resource "google_project_iam_member" "quiz_app_sa_roles" {
 }
 
 data "archive_file" "app-engine-source-zip" {
- type        = "zip"
- source_dir  = "./app"
- output_path = "./app.zip"
+  type        = "zip"
+  source_dir  = "./app"
+  output_path = "./app.zip"
+
+  depends_on = [
+    local_file.project-id,
+    local_file.suffix,
+  ]
 }
 
 # Upload the app.zip to the bucket
