@@ -1,12 +1,9 @@
 import random
-import json
 import time
 from pathlib import Path
-from wsgiref.simple_server import WSGIRequestHandler
 import firebase_admin
 from google.cloud import firestore_admin_v1, storage, secretmanager
-from firebase_admin import credentials
-from firebase_admin import firestore
+from firebase_admin import credentials, firestore
 from flask import Flask, render_template, request, redirect, make_response
 app = Flask(__name__)
 

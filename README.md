@@ -1,9 +1,9 @@
 # Quiz Engine
-The main purpose of this application is to provide a solution which is supporting self-development and practice exams. The content can be managed easyly according to any custom needs. Also it can be shared within a team and restrict the access by granting permission only for specific Google-Users, -Groups or -Domains.
+The main purpose of this application is to provide a solution which is supporting self-development and practice exams. The content can be managed easyly according to any custom needs. The generated Quiz website can be published for a public accessibility or it can be shared within a team and restrict the access by granting permission only for specific Google-Users, -Groups or -Domains.
 
 # Overview
 The Quiz Engine was designed for Google Cloud. The solution was developed by using services on a low-cost (or even free) way, but still having the possibility to scale-up if necessary.
-![Alt text](Diagram-Quiz-Engine.png?raw=true "Quiz Engine")
+![Alt text](images/Diagram-Quiz-Engine.png?raw=true "Quiz Engine")
 
 ## Resources
 
@@ -26,9 +26,10 @@ This noSQL database is used for storing all the documents (categories, groups, q
 - Storage bucket ***quiz-engine-storage-db-exports***: location for the database exports, created by the admin user
 
 ### Identity-Aware Proxy
-
+The Identity-Aware Proxy (IAP) allows to restrict the access for specific Google-Accounts, or make the access possible for the public.
 
 ### Secret Manager
+Sensitive information like the admin password is stored in Secret Manager.
 
 ## Key Features
 - Quiz mode
@@ -45,8 +46,95 @@ This noSQL database is used for storing all the documents (categories, groups, q
   - Database Export/Import
 
 ## Database
+The database is located in the Collection ***quiz_db*** in Cloud Firestore. The following document types are used inside the database:
+- main-category
+- sub-category
+- group
+- question
 
-### Document schemas
+![Alt text](images/Database-Quiz-Engine.png?raw=true "Quiz Engine")
+
+### Document JSON schemas
+#### Main Category
+```
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "type": "object",
+    "properties": {
+        "id": {"type": "string"},
+        "name": {"type": "string"},
+        "type": {"const": "main-category"}
+    },
+    "required": [
+        "type",
+        "name",
+        "id"
+    ]
+}
+```
+
+#### Sub Category
+```
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "type": "object",
+    "properties": {
+        "id": {"type": "string"},
+        "name": {"type": "string"},
+        "main_category_id": {"type": "string"},
+        "type": {"const": "sub-category"}
+    },
+    "required": [
+        "type",
+        "name",
+        "main_category_id",
+        "id"
+    ]
+}
+```
+
+#### Question Group
+```
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "type": "object",
+    "properties": {
+        "id": {"type": "string"},
+        "name": {"type": "string"},
+        "sub_category_id": {"type": "string"},
+        "type": {"const": "group"}
+    },
+    "required": [
+        "type",
+        "name",
+        "sub_category_id",
+        "id"
+    ]
+}
+```
+
+#### Question
+```
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "type": "object",
+    "properties": {
+        "id": {"type": "string"},
+        "question": {"type": "string"},
+        "documentation": {"type": "string"},
+        "solution_comment": {"type": "string"},
+        "group_id": {"type": "string"},
+        
+        "type": {"const": "question"}
+    },
+    "required": [
+        "type",
+        "name",
+        "sub_category_id",
+        "id"
+    ]
+}
+```
 
 # Installation
 
