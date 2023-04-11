@@ -1,5 +1,6 @@
 # Quiz Engine
 [![Github All Releases](https://img.shields.io/github/downloads/khelmric/quiz-engine/total.svg)]()
+[![Github All Releases](https://img.shields.io/github/v/release/khelmric/quiz-engine)]()
 
 The main purpose of this application is to provide a solution which is supporting self-development and practice exams. The content can be managed easyly according to any custom needs. The generated Quiz website can be published for a public accessibility or it can be shared within a team and restrict the access by granting permission only for specific Google-Users, -Groups or -Domains.
 
