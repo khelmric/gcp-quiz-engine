@@ -8,10 +8,10 @@ The Quiz Engine was designed for Google Cloud. The solution was developed by usi
 
 ## Resources
 
-### Terraform
+### Terraform <img src="images/icons/terraform.png" align="right" width="5%" height="5%"> 
 All required components are deployed with Terraform scripts. The customization can be done in the `terraform.tfvars` file.
 
-### App Engine
+### App Engine <img src="images/icons/app_engine.png" align="right" width="5%" height="5%"> 
 The Python-based application is deployed to an App Engine instance in a dedicated Google Cloud project.
 The main components are:
 - Python
@@ -19,17 +19,18 @@ The main components are:
 - HTML/CSS
 - Jinja templates
 
-### Cloud Firestore
+### Firestore <img src="images/icons/firestore.png" align="right" width="5%" height="5%"> 
 This noSQL database is used for storing all the documents (categories, groups, questions).
 
-### Cloud Storage
+### Cloud Storage <img src="images/icons/cloud_storage.png" align="right" width="5%" height="5%"> 
 - Storage bucket ***quiz-engine-storage-app***: location for the `app.zip` file, used by the App Engine
 - Storage bucket ***quiz-engine-storage-db-exports***: location for the database exports, created by the admin user
 
-### Identity-Aware Proxy
-The Identity-Aware Proxy (IAP) allows to restrict the access for specific Google-Accounts, or make the access possible for the public.
 
-### Secret Manager
+### Identity-Aware Proxy <img src="images/icons/identity-aware_proxy.png" align="right" width="5%" height="5%"> 
+<p>The Identity-Aware Proxy (IAP) allows to restrict the access for specific Google-Accounts, or make the access possible for the public.</p>
+
+### Secret Manager <img src="images/icons/secret_manager.png" align="right" width="5%" height="5%"> 
 Sensitive information like the admin password is stored in Secret Manager.
 
 ## Key Features
@@ -47,7 +48,7 @@ Sensitive information like the admin password is stored in Secret Manager.
   - Database Export/Import
 
 ## Database
-The database is located in the Collection ***quiz_db*** in Cloud Firestore. The following document types are used inside the database:
+The database is located in the Collection ***quiz_db*** in Firestore. The following document types are used inside the database:
 - main-category
 - sub-category
 - group
@@ -192,10 +193,25 @@ terraform plan
 terraform apply
 ```
 ### Post-installation steps
+#### Turn on IAP
+All related resources will be configured by Terraform, but the IAP itself will not be turned on by default and has to be done manually.
+- Go to https://console.cloud.google.com/security/iap (make sure, that the right project is selected)
+- In the IAP column for App Engine app turn the switch to the on state
+- Confirm
+
+#### OAuth brand data
+Only "Organization Internal" brands can be created programmatically via API. To convert it into an external brands please use the GCP Console. Otherwise only internal accounts (from the registered domain) will be allowed.
+- Go to https://console.cloud.google.com/apis/credentials/consent (make sure, that the right project is selected)
+- Click "MAKE EXTERNAL"
+- Select the "In production" option
+- Confirm
 
 # Usage
 ## Navigate and start a quiz
-![Alt text](images/ScreenRecord-Quiz-Engine-How-to-navigate.gif?raw=true "Database")
+![Alt text](images/ScreenRecord-Quiz-Engine-How-to-navigate.gif?raw=true "navigate")
+
+## Switch to Edit-mode
+![Alt text](images/ScreenRecord-Quiz-Engine-How-to-edit-mode.gif?raw=true "edit-mode")
 
 # License
 The Quiz Engine is licensed under the terms of the GPL Open Source license and is available for free.
