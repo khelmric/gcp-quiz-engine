@@ -1,13 +1,14 @@
-# Mandatory parameters
+# Mandatory variables
 suffix          = "0001"
 org_id          = "123456789"
 project_id      = "quiz-engine-0001"
 billing_account = "012345-6789AB-CDEFGHIJ"
 
-# Optional parameters
+# Optional variables
 #project_name    = "Quiz Engine"
 #location        = "us-west1"
 #admin_password  = "admin123!"
-#web_app_members  = [ "user:john.doe@example.com", "group:sample-group@example.com", "domain:example.com" ]
+#web_app_members = [ "user:john.doe@example.com", "group:sample-group@example.com", "domain:example.com" ]
+#max_instances   = 2
 
 

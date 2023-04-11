@@ -25,7 +25,7 @@ variable "billing_account" {
 variable "location" {
   description = "Location ID of the Quiz Engine resources."
   type        = string
-  default     = "EU"
+  default     = "us-west1"
 }
 
 variable "suffix" {

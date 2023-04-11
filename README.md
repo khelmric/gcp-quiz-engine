@@ -181,6 +181,20 @@ cd quiz-engine
 ```
 vi terraform.tfvars
 ```
+#### Variables
+| **Variable**    | **Description**                          | **Type**     | **Mandatory** | **Default**      | **Example**                                                                             |
+|-----------------|------------------------------------------|--------------|---------------|------------------|-----------------------------------------------------------------------------------------|
+| org_id          | Organization ID                          | string       | yes           | null             | "123456789"                                                                             |
+| project_id      | Project ID                               | string       | yes           | null             | "quiz-engine"                                                                           |
+| billing_account | Billing Account ID                       | string       | yes           | null             | "012345-6789AB-CDEFGHIJ"                                                                |
+| suffix          | Resource suffix                          | string       | yes           | null             | "0001"                                                                                  |
+| project_name    | Project display name                     | string       | no            | "Quiz Engine"    | "Team Quiz"                                                                             |
+| location        | Resource location                        | string       | no            | "us-west1"       | "europe-west3"                                                                          |
+| admin_password  | Admin password to activate the edit-mode | string       | no            | "quizEngine123!" | "V%234=gRTT_25"                                                                         |
+| web_app_members | Allowed accounts to access the website   | list(string) | no            | [  "allUsers"  ] | [ "user:john.doe@example.com", "group:sample-group@example.com", "domain:example.com" ] |
+| max_instances   | App Engine max instances                 | number       | no            | 2                | 4                                                                                       |
+
+
 ### Set the Application Default Credentials
 Login with your user credentials to use it for Application Default Credentials
 ```
