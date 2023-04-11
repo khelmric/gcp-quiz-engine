@@ -1,4 +1,5 @@
 # Quiz Engine
+
 The main purpose of this application is to provide a solution which is supporting self-development and practice exams. The content can be managed easyly according to any custom needs. The generated Quiz website can be published for a public accessibility or it can be shared within a team and restrict the access by granting permission only for specific Google-Users, -Groups or -Domains.
 
 # Overview
@@ -52,7 +53,7 @@ The database is located in the Collection ***quiz_db*** in Cloud Firestore. The 
 - group
 - question
 
-![Alt text](images/Database-Quiz-Engine.png?raw=true "Quiz Engine")
+![Alt text](images/Database-Quiz-Engine.png?raw=true "Database")
 
 ### Document JSON schemas
 #### Main Category
@@ -190,3 +191,12 @@ terraform init
 terraform plan
 terraform apply
 ```
+### Post-installation steps
+
+# Usage
+## Navigate and start a quiz
+![Alt text](images/ScreenRecord-Quiz-Engine-How-to-navigate.gif?raw=true "Database")
+
+# License
+The Quiz Engine is licensed under the terms of the GPL Open Source license and is available for free.
+
