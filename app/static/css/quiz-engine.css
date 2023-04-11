@@ -83,25 +83,6 @@ body {
   background-color:#db0000;
 }
 
-
-/*
-.edit_mode {
-  float: right;
-  font-size: 22px;
-  text-align: center;
-  padding: 4px;
-  text-decoration: none;
-  margin: 0px;
-}
-
-.edit_mode_active {
-  background-color:#db0000;
-  text-align: right;
-  padding: 6px;
-  margin: 0px;
-}
-*/
-
 .passwd_field {
   display: inline-block;
   /*float: center;*/

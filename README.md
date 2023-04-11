@@ -8,7 +8,7 @@ The Quiz Engine was designed for Google Cloud. The solution was developed by usi
 
 ## Resources
 
-### Terraform <img src="images/icons/terraform.png" align="right" width="5%" height="5%"> 
+### Terraform <img src="images/icons/terraform.png" align="right" width="4%" height="4%"> 
 All required components are deployed with Terraform scripts. The customization can be done in the `terraform.tfvars` file.
 
 ### App Engine <img src="images/icons/app_engine.png" align="right" width="5%" height="5%"> 
@@ -224,7 +224,7 @@ Only "Organization Internal" brands can be created programmatically via API. To 
 ## Navigate and start a quiz
 ![Alt text](images/ScreenRecord-Quiz-Engine-How-to-navigate.gif?raw=true "navigate")
 
-## Switch to Edit-mode
+## Switch to edit-mode
 ![Alt text](images/ScreenRecord-Quiz-Engine-How-to-edit-mode.gif?raw=true "edit-mode")
 
 # License
