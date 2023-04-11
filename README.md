@@ -124,13 +124,34 @@ The database is located in the Collection ***quiz_db*** in Cloud Firestore. The 
         "documentation": {"type": "string"},
         "solution_comment": {"type": "string"},
         "group_id": {"type": "string"},
-        
+        "answers": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "properties": {
+                    "answer": {
+                        "type": "string"
+                    },
+                    "comment": {
+                        "type": "string"
+                    },
+                    "correct": {
+                        "type": "boolean"
+                    }
+                },
+                "required": [
+                    "answer",
+                    "correct"
+                ]
+            }
+        },
         "type": {"const": "question"}
     },
     "required": [
         "type",
         "name",
-        "sub_category_id",
+        "group_id",
+        "answers",
         "id"
     ]
 }
@@ -139,13 +160,32 @@ The database is located in the Collection ***quiz_db*** in Cloud Firestore. The 
 # Installation
 
 ## Prerequisites
+### Resources
+- Google Cloud environment
+- Billing Account
 
-## Customization
+### Required Permissions
+- Project Creator role (roles/resourcemanager.projectCreator)
+- Billing Account User role (roles/billing.user)
 
 ## Deployment
+### Get the code
+(This step can be done e.g. in a Cloud Shell terminal)
 ```
-cd init
+git clone https://github.com/khelmric/quiz-engine.git
+cd quiz-engine
+```
+### Update the Terraform variables
+```
+vi terraform.tfvars
+```
+### Set the Application Default Credentials
+Login with your user credentials to use it for Application Default Credentials
+```
 gcloud auth application-default login
+```
+### Execute the Terraform code
+```
 terraform init
 terraform plan
 terraform apply
