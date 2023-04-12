@@ -171,6 +171,7 @@ The database is located in the Collection ***quiz_db*** in Firestore. The follow
 ### Required Permissions
 - Project Creator role (roles/resourcemanager.projectCreator)
 - Billing Account User role (roles/billing.user)
+- Organization Policy Administrator (roles/orgpolicy.policyAdmin)
 
 ## Deployment
 ### Get the code
