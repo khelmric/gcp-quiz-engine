@@ -13,7 +13,6 @@ sub_categories = []
 groups = []
 questions = []
 header_path = ""
-edit_mode = False
 passwd_input_visible = False
 project_id = Path('env_project_id.txt').read_text()
 suffix = Path('env_suffix.txt').read_text()
@@ -50,6 +49,8 @@ def index():
     header_path=""
     try: passwd_input_visible
     except NameError: passwd_input_visible = False
+    try: edit_mode
+    except NameError: edit_mode = False
 
     # query main categories
     firestore_main_categories = db_ref.where('type', '==', 'main-category')
